@@ -1,0 +1,28 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    restart: always
+    ports:
+      - 127.0.0.1:3001:3001
+    volumes:
+      - ./backend:/app
+    networks:
+      - upmonitor-net
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: always
+    ports:
+      - 127.0.0.1:3000:3000
+    volumes:
+      - ./frontend:/app
+    networks:
+      - upmonitor-net
+    depends_on:
+      - backend
+
+networks:
+  upmonitor-net:
+    driver: bridge
