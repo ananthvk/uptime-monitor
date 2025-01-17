@@ -9,6 +9,15 @@ services:
       - ./backend:/app
     networks:
       - upmonitor-net
+    depends_on:
+      - db
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=dev
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=upmonitor
+      - DEFAULT_DB=postgres
 
   frontend:
     build:
@@ -22,7 +31,24 @@ services:
       - upmonitor-net
     depends_on:
       - backend
+  db:
+    image: postgres:16-alpine
+    expose:
+      - 5432
+    ports:
+      - 127.0.0.1:5432:5432
+    networks:
+      - upmonitor-net
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=dev
 
 networks:
   upmonitor-net:
     driver: bridge
+
+volumes:
+  db_volume:
+    driver: local
