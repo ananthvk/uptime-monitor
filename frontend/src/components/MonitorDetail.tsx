@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router"
 import axiosClient from "../axios-client";
 import { useMutation, useQuery } from "react-query";
-import { Alert, Box, Button } from "@mui/material";
+import { Alert, Box, IconButton } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 
 type Monitor = { id: string, name: string, url: string, port: string, type: string }
@@ -55,10 +55,10 @@ function MonitorDetail() {
                 {monitor?.name}
             </h1>
             <Box>
-                <Button component={Link} to={`/monitor/${monitor_id}/edit`}>
+                <IconButton aria-label="Edit this monitor" component={Link} to={`/monitor/${monitor_id}/edit`}>
                     <Edit />
-                </Button>
-                <Button onClick={() => {
+                </IconButton>
+                <IconButton aria-label="Delete this monitor" onClick={() => {
                     deleteMutation.mutate({}, {
                         onSuccess: (_: any) => {
                             navigate(`/dashboard`)
@@ -66,7 +66,7 @@ function MonitorDetail() {
                     })
                 }}>
                     <Delete />
-                </Button>
+                </IconButton>
             </Box>
         </Box>
         <p>

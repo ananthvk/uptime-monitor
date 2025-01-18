@@ -42,12 +42,8 @@ function MonitorList() {
 
     return <Box display="flex" flexDirection="column" justifyItems="center" alignItems="center">
         <h1>
-            List of monitors
+            Dashboard
         </h1>
-        <Button variant='contained' component={Link} to="/monitor/new">
-            <Add />
-            New Monitor
-        </Button>
         <Box
             display="flex"
             flexDirection="column"
@@ -64,6 +60,13 @@ function MonitorList() {
             }}
             gap={3}
         >
+
+            <Box display="flex" flexDirection="row" justifyContent="flex-end" width="100%">
+                <Button variant='contained' component={Link} to="/monitor/new">
+                    <Add />
+                    New Monitor
+                </Button>
+            </Box>
             {
                 monitors?.map(monitor =>
                     <MonitorListItem key={monitor.id} monitor={monitor} />
