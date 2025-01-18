@@ -1,7 +1,7 @@
-import { useParams } from "react-router"
+import { Link, useNavigate, useParams } from "react-router"
 import axiosClient from "../axios-client";
-import { useQuery } from "react-query";
-import { Box, Button } from "@mui/material";
+import { useMutation, useQuery } from "react-query";
+import { Alert, Box, Button } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 
 type Monitor = { id: string, name: string, url: string, port: string, type: string }
@@ -23,6 +23,12 @@ function MonitorDetail() {
         { enabled: !!monitor_id }
     )
 
+    const deleteMutation = useMutation((_: any): any => {
+        return axiosClient.delete(`monitor/${monitor_id}`)
+    })
+
+    const navigate = useNavigate()
+
     if (isLoading) return <div>Loading...</div>;
     if (error) {
         if ((error as any).status === 404)
@@ -38,18 +44,27 @@ function MonitorDetail() {
                 md: '50%',
                 lg: '40%',
                 xl: '30%'
-            }
+            },
+            outline: '1px lightgray solid',
+            padding: '1em'
         }}
+        marginTop="1em"
         marginLeft="1em">
         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
             <h1>
                 {monitor?.name}
             </h1>
             <Box>
-                <Button>
+                <Button component={Link} to={`/monitor/${monitor_id}/edit`}>
                     <Edit />
                 </Button>
-                <Button>
+                <Button onClick={() => {
+                    deleteMutation.mutate({}, {
+                        onSuccess: (_: any) => {
+                            navigate(`/dashboard`)
+                        }
+                    })
+                }}>
                     <Delete />
                 </Button>
             </Box>
@@ -60,6 +75,8 @@ function MonitorDetail() {
         <p>
             {monitor?.url}:{monitor?.port}
         </p>
+        {deleteMutation.isLoading ? <Alert severity='info'>Submitting...</Alert> : <></>}
+        {deleteMutation.isError ? <Alert severity='error'>Error: {(deleteMutation as any).error.message}</Alert> : <></>}
     </Box>
 }
 
