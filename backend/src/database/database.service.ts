@@ -1,11 +1,9 @@
-import { Global, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { Kysely, PostgresDialect } from 'kysely';
 import { Database } from './types';
 
-
-@Global()
 @Injectable()
 export class DatabaseService {
     private db: Kysely<Database>;
