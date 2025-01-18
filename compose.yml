@@ -45,6 +45,24 @@ services:
     environment:
       - POSTGRES_PASSWORD=dev
 
+  migrations:
+    build:
+      context: ./backend
+    entrypoint: ./entrypoint-migrate.sh
+    volumes:
+      - ./backend:/app
+    networks:
+      - upmonitor-net
+    depends_on:
+      - db
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=dev
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=upmonitor
+      - DEFAULT_DB=postgres
+
 networks:
   upmonitor-net:
     driver: bridge

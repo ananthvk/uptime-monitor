@@ -3,12 +3,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppLoggerMiddleware } from './logger.middleware';
 import { DatabaseModule } from './database/database.module';
+import { MonitorModule } from './monitor/monitor.module';
 
 @Module({
-  imports: [DatabaseModule],
-  controllers: [AppController],
-  providers: [AppService],
+    imports: [DatabaseModule, MonitorModule],
+    controllers: [AppController],
+    providers: [AppService],
 })
+
 
 export class AppModule {
     configure(consumer: MiddlewareConsumer): void {
