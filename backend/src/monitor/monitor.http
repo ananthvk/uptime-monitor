@@ -1,0 +1,34 @@
+# Requests to test out the various routes
+@api_url=http://localhost:3001/api/v1
+
+### Get all monitors
+GET {{api_url}}/monitor
+
+### Get a specific monitor
+GET {{api_url}}/monitor/3
+
+### Create a new monitor
+POST {{api_url}}/monitor
+Content-Type: application/json
+
+{
+    "name": "Some Other website get check",
+    "type": "HTTP",
+    "url": "https://somerandomwebsite.com",
+    "port": "80",
+    "method": "GET"
+}
+
+### Update a monitor
+PATCH  {{api_url}}/monitor/3
+Content-Type: application/json
+
+{
+    "port": "72",
+    "method": "POST",
+    "type": "HTTP"
+}
+
+
+### Delete a monitor
+DELETE {{api_url}}/monitor/5

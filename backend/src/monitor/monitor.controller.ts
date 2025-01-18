@@ -19,7 +19,7 @@ export class MonitorController {
     // GET /monitor/:id, return details of a single monitor
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
-        return this.monitorService.findOne(id)
+        return this.monitorService.findOne(currentUserId, id)
     }
 
     // POST /monitor, create a new monitor
@@ -31,12 +31,12 @@ export class MonitorController {
     // PATCH /monitor/:id, update a monitor
     @Patch(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) updateMonitorDto: UpdateMonitorDto) {
-        return this.monitorService.update(id, updateMonitorDto)
+        return this.monitorService.update(currentUserId, id, updateMonitorDto)
     }
 
     // DELETE /monitor/:id, delete a monitor
     @Delete(':id')
     delete(@Param('id', ParseIntPipe) id: number) {
-        return this.monitorService.delete(id)
+        return this.monitorService.delete(currentUserId, id)
     }
 }

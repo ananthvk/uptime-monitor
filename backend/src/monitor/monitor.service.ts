@@ -62,26 +62,27 @@ export class MonitorService {
         return this.monitors.filter(x => x.user_id === user_id)
     }
 
-    findOne(monitor_id: number) {
-        const monitor = this.monitors.filter(x => x.id === monitor_id)
+    findOne(user_id: number, monitor_id: number) {
+        const monitor = this.monitors.filter(x => x.id === monitor_id && x.user_id === user_id)
         if (monitor.length === 0)
             throw new NotFoundException('Monitor with given id not found')
         return monitor
     }
 
-    update(monitor_id: number, updateMonitorDto: UpdateMonitorDto) {
+    update(user_id: number, monitor_id: number, updateMonitorDto: UpdateMonitorDto) {
         this.monitors = this.monitors.map((monitor) => {
-            if (monitor.id == monitor_id) {
-                return { ...updateMonitorDto, ...monitor }
+            if (monitor.id === monitor_id && monitor.user_id === user_id) {
+                console.log('Update')
+                return { ...monitor, ...updateMonitorDto}
             }
             return monitor
         })
-        return this.findOne(monitor_id)
+        return this.findOne(user_id, monitor_id)
     }
 
-    delete(monitor_id: number) {
-        const deletedMonitor = this.findOne(monitor_id)
-        this.monitors = this.monitors.filter((monitor) => monitor.id !== monitor_id)
+    delete(user_id: number, monitor_id: number) {
+        const deletedMonitor = this.findOne(user_id, monitor_id)
+        this.monitors = this.monitors.filter((monitor) => (monitor.user_id === user_id) && (monitor.id !== monitor_id))
         return deletedMonitor
     }
 
@@ -92,6 +93,7 @@ export class MonitorService {
         newMonitor.id = this.nextMonitorId
         this.monitors.push(newMonitor)
         this.nextMonitorId++
+        return newMonitor
     }
 }
 
