@@ -66,7 +66,7 @@ export class MonitorService {
         const monitor = this.monitors.filter(x => x.id === monitor_id && x.user_id === user_id)
         if (monitor.length === 0)
             throw new NotFoundException('Monitor with given id not found')
-        return monitor
+        return monitor[0]
     }
 
     update(user_id: number, monitor_id: number, updateMonitorDto: UpdateMonitorDto) {

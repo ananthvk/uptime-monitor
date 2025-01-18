@@ -1,23 +1,27 @@
 import { useQuery } from 'react-query';
 import axiosClient from '../axios-client'
-import './MonitorList.css'
+import { Link } from 'react-router';
+import { Box, Button, Card, CardActionArea } from '@mui/material';
+import { Add } from '@mui/icons-material';
 
 type Monitor = { id: string, name: string, url: string, port: string, type: string }
 
 function MonitorListItem({ monitor }: { monitor: Monitor }) {
-    return <div className='list-item'>
-        <h2>
-            {monitor.name}
-        </h2>
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-            <p style={{ fontStyle: 'italic' }}>
-                {monitor.url}:{monitor.port}
-            </p>
-            <p style={{ fontWeight: 'bold' }}>
-                {monitor.type}
-            </p>
-        </div>
-    </div>
+    return <Card sx={{ width: '100%' }}>
+        <CardActionArea component={Link} to={`/monitor/${monitor.id}`} sx={{ padding: '1em' }}>
+            <h2>
+                {monitor.name}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <p style={{ fontStyle: 'italic' }}>
+                    {monitor.url}:{monitor.port}
+                </p>
+                <p style={{ fontWeight: 'bold' }}>
+                    {monitor.type}
+                </p>
+            </div>
+        </CardActionArea>
+    </Card>
 }
 
 
@@ -36,15 +40,36 @@ function MonitorList() {
     if (isLoading) return <div>Loading...</div>;
     if (error) return <div>Error occured while fetching data from server {(error as any).message} </div>
 
-    return <div style={{ display: 'flex', flexDirection: 'column', justifyItems: 'center', alignItems: 'center' }}>
+    return <Box display="flex" flexDirection="column" justifyItems="center" alignItems="center">
         <h1>
             List of monitors
         </h1>
-        {
-            monitors?.map(monitor =>
-                <MonitorListItem key={monitor.id} monitor={monitor} />
-            )
-        }
-    </div>
+        <Button variant='contained' component={Link} to="/monitor/new">
+            <Add />
+            New Monitor
+        </Button>
+        <Box
+            display="flex"
+            flexDirection="column"
+            justifyItems="center"
+            alignItems="center"
+            sx={{
+                width: {
+                    xs: '90%',
+                    sm: '80%',
+                    md: '70%',
+                    lg: '60%',
+                    xl: '50%'
+                }
+            }}
+            gap={3}
+        >
+            {
+                monitors?.map(monitor =>
+                    <MonitorListItem key={monitor.id} monitor={monitor} />
+                )
+            }
+        </Box>
+    </Box >
 }
 export default MonitorList
