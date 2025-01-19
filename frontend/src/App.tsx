@@ -10,7 +10,7 @@ function App() {
     return (
         <BrowserRouter>
             <AppBar position="static" enableColorOnDark>
-                <Toolbar sx={{gap: 3}}>
+                <Toolbar sx={{ gap: 3 }}>
                     <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
                         Uptime Monitor
                     </Typography>
@@ -22,8 +22,8 @@ function App() {
                 <Route path="/dashboard" element={<MonitorList />} />
                 <Route path="monitor">
                     <Route path=":monitor_id" element={<MonitorDetail />} />
-                    <Route path=":monitor_id/edit" element={<EditMonitor />} />
-                    <Route path="new" element={<CreateMonitor />} />
+                    <Route path=":monitor_id/edit" element={<EditMonitor isEdit={true} />} />
+                    <Route path="new" element={<EditMonitor isEdit={false} />} />
                 </Route>
             </Routes>
         </BrowserRouter>

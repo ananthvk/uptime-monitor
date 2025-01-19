@@ -5,7 +5,6 @@ import axiosClient from '../axios-client';
 import { useNavigate, useParams } from 'react-router';
 import Loader from './Loader';
 
-// TODO: Reuse create monitor instead of creating a new component
 type Monitor = { id: string, name: string, url: string, port: string, type: string, method: string }
 
 const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
@@ -13,22 +12,18 @@ const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
     return response.data as Monitor
 }
 
+const methods = ['GET', 'HEAD', 'OPTIONS', 'TRACE', 'PUT', 'DELETE', 'POST', 'PATCH', 'CONNECT'] as const
 
-function EditMonitor() {
+function EditMonitor({ isEdit }: { isEdit: boolean }) {
+
     const { monitor_id } = useParams<{ monitor_id: string }>()
 
-    const {
-        data: serverState,
-        error,
-        isLoading
-    } = useQuery(
-        ['monitorData', monitor_id],
-        () => { return retrieveMonitorDetail(monitor_id!) },
-        { enabled: !!monitor_id }
-    )
-
     const mutation = useMutation((newMonitor: any): any => {
-        return axiosClient.patch(`monitor/${monitor_id}`, newMonitor)
+        if (isEdit) {
+            return axiosClient.patch(`monitor/${monitor_id}`, newMonitor)
+        } else {
+            return axiosClient.post('monitor', newMonitor)
+        }
     })
 
     const navigate = useNavigate()
@@ -39,23 +34,36 @@ function EditMonitor() {
     const [port, setPort] = useState("80")
     const [method, setMethod] = useState("GET")
 
-    useEffect(() => {
-        if (serverState) {
-            setName(serverState?.name)
-            setType(serverState?.type)
-            setUrl(serverState?.url)
-            setPort(serverState?.port.toString())
-            setMethod(serverState?.method)
-        }
-    }, [serverState])
+    if (isEdit) {
+        const {
+            data: serverState,
+            error,
+            isLoading
+        } = useQuery(
+            ['monitorData', monitor_id],
+            () => { return retrieveMonitorDetail(monitor_id!) },
+            { enabled: !!monitor_id }
+        )
 
-    if (isLoading) 
-        return <Loader />
-    if (error) {
-        if ((error as any).status === 404)
-            return <h1>404 Not Found</h1>
-        return <div>Error occured while fetching data from server {(error as any).message} </div>
+        useEffect(() => {
+            if (isEdit && serverState) {
+                setName(serverState?.name)
+                setType(serverState?.type)
+                setUrl(serverState?.url)
+                setPort(serverState?.port.toString())
+                setMethod(serverState?.method)
+            }
+        }, [serverState])
+
+        if (isLoading)
+            return <Loader />
+        if (error) {
+            if ((error as any).status === 404)
+                return <h1>404 Not Found</h1>
+            return <div>Error occured while fetching data from server {(error as any).message} </div>
+        }
     }
+
 
     return <Box display="flex" alignContent="center" justifyContent="center" marginTop="5em">
         <Paper elevation={3} sx={{
@@ -68,9 +76,11 @@ function EditMonitor() {
                 xl: '30%'
             }
         }}>
-            <h1>
-                Edit Monitor "{name}"
-            </h1>
+            {
+                isEdit
+                    ? <h1>Edit Monitor "{name}"</h1>
+                    : <h1>New Monitor</h1>
+            }
             <form>
                 <Box display="flex" alignContent="center" justifyContent="center" flexDirection="column" gap={3}>
                     <TextField required label="Monitor name" variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
@@ -83,15 +93,9 @@ function EditMonitor() {
                     {
                         type === "HTTP" ?
                             <Select variant='outlined' label="Type" value={method} onChange={(e) => setMethod(e.target.value)}>
-                                <MenuItem value={"GET"}>GET</MenuItem>
-                                <MenuItem value={"HEAD"}>HEAD</MenuItem>
-                                <MenuItem value={"OPTIONS"}>OPTIONS</MenuItem>
-                                <MenuItem value={"TRACE"}>TRACE</MenuItem>
-                                <MenuItem value={"PUT"}>PUT</MenuItem>
-                                <MenuItem value={"DELETE"}>DELETE</MenuItem>
-                                <MenuItem value={"POST"}>POST</MenuItem>
-                                <MenuItem value={"PATCH"}>PATCH</MenuItem>
-                                <MenuItem value={"CONNECT"}>CONNECT</MenuItem>
+                                {
+                                    methods.map((method) => <MenuItem value={method} key={method}>{method}</MenuItem>)
+                                }
                             </Select>
                             : <></>
                     }
@@ -109,7 +113,7 @@ function EditMonitor() {
                             }
                         })
                     }}>Save</Button>
-                    {mutation.isLoading ? <Alert severity='info'>Submitting...</Alert> : <></>}
+                    {mutation.isLoading ? <Alert severity='info'>Saving...</Alert> : <></>}
                     {mutation.isError ? <Alert severity='error'>Error: {(mutation as any).error.message}</Alert> : <></>}
                 </Box>
             </form>

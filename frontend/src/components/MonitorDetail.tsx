@@ -57,7 +57,7 @@ function MonitorDetail() {
             </h1>
             <Box>
                 <IconButton aria-label="Edit this monitor" component={Link} to={`/monitor/${monitor_id}/edit`}>
-                    <Edit />
+                    <Edit/>
                 </IconButton>
                 <IconButton aria-label="Delete this monitor" onClick={() => {
                     deleteMutation.mutate({}, {

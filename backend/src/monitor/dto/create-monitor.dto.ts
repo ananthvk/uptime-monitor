@@ -1,4 +1,4 @@
-import { IsEnum, IsIP, IsNotEmpty, IsPort, IsString, IsUrl } from "class-validator";
+import { IsEnum, IsNotEmpty, IsPort, IsString, IsUrl } from "class-validator";
 
 export class CreateMonitorDto {
     @IsString()
