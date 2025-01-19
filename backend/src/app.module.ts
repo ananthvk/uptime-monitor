@@ -5,9 +5,10 @@ import { AppLoggerMiddleware } from './logger.middleware';
 import { DatabaseModule } from './database/database.module';
 import { MonitorModule } from './monitor/monitor.module';
 import { QueueModule } from './queue/queue.module';
+import { HeartbeatModule } from './heartbeat/heartbeat.module';
 
 @Module({
-    imports: [DatabaseModule, MonitorModule, QueueModule],
+    imports: [DatabaseModule, MonitorModule, QueueModule, HeartbeatModule],
     controllers: [AppController],
     providers: [AppService],
 })
