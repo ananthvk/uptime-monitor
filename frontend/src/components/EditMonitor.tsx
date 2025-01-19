@@ -5,7 +5,7 @@ import axiosClient from '../axios-client';
 import { useNavigate, useParams } from 'react-router';
 import Loader from './Loader';
 
-type Monitor = { id: string, name: string, url: string, port: string, type: string, method: string }
+type Monitor = { id: string, name: string, url: string, port: string, type: string, method: string, time_interval: number }
 
 const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
     const response = await axiosClient.get(`monitor/${id}`);
@@ -33,6 +33,7 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
     const [url, setUrl] = useState("")
     const [port, setPort] = useState("80")
     const [method, setMethod] = useState("GET")
+    const [time_interval, setTimeInterval] = useState(5)
 
     if (isEdit) {
         const {
@@ -99,6 +100,7 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
                             </Select>
                             : <></>
                     }
+                    <TextField type="number" label="Time interval (in seconds)" variant="outlined" value={time_interval} onChange={(e) => setTimeInterval(parseInt(e.target.value))} />
                     <Button variant="contained" onClick={() => {
                         // TODO: Validation
                         mutation.mutate({
@@ -106,7 +108,8 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
                             type,
                             url,
                             port,
-                            method
+                            method,
+                            time_interval
                         }, {
                             onSuccess: (data: any) => {
                                 navigate(`/monitor/${data.data.id}`)

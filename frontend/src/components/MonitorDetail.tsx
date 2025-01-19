@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 import Loader from "./Loader";
 import EditDeleteMonitorButton from "./EditDeleteMonitorButton";
 
-type Monitor = { id: string, name: string, url: string, port: string, type: string }
+type Monitor = { id: string, name: string, url: string, port: string, type: string, time_interval: number }
 
 const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
     const response = await axiosClient.get(`monitor/${id}`);
@@ -59,6 +59,9 @@ function MonitorDetail() {
         </p>
         <p>
             {monitor?.url}:{monitor?.port}
+        </p>
+        <p>
+            Check every {monitor?.time_interval}s 
         </p>
     </Box>
 }

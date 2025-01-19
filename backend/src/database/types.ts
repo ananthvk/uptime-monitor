@@ -26,7 +26,8 @@ export interface MonitorTable {
     type: 'HTTP' | 'TCP',
     url: string,
     port: string,
-    method: 'GET' | 'HEAD' | 'OPTIONS' | 'TRACE' | 'PUT' | 'DELETE' | 'POST' | 'PATCH' | 'CONNECT'
+    method: 'GET' | 'HEAD' | 'OPTIONS' | 'TRACE' | 'PUT' | 'DELETE' | 'POST' | 'PATCH' | 'CONNECT',
+    time_interval: number
 }
 
 export type Monitor = Selectable<MonitorTable>

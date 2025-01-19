@@ -23,7 +23,7 @@ export class MonitorService {
             .selectFrom('monitor')
             .where('usr_id', '=', user_id)
             .where('id', '=', monitor_id)
-            .select(['id', 'usr_id', 'name', 'date_created', 'type', 'url', 'port', 'method'])
+            .select(['id', 'usr_id', 'name', 'date_created', 'type', 'url', 'port', 'method', 'time_interval'])
             .executeTakeFirstOrThrow(() => new NotFoundException("Monitor with given id not found"))
     }
 
@@ -53,20 +53,27 @@ export class MonitorService {
             method: createMonitorDto.method,
             port: createMonitorDto.port,
             type: createMonitorDto.type,
-            url: createMonitorDto.url
+            url: createMonitorDto.url,
+            time_interval: createMonitorDto.time_interval
         })
             .returning(['id', 'name', 'usr_id', 'method', 'port', 'type', 'url'])
             .executeTakeFirstOrThrow()
 
         // Add this monitor to the heartbeat queue
-        const job = await this.heartbeatQueue.add('new_monitor', {
+        // TODO: Add job id to db
+        const job = await this.heartbeatQueue.add('check_heartbeat', {
             id: result.id,
             name: createMonitorDto.name,
             usr_id: user_id,
             method: createMonitorDto.method,
             port: createMonitorDto.port,
             type: createMonitorDto.type,
-            url: createMonitorDto.url
+            url: createMonitorDto.url,
+            time_interval: createMonitorDto.time_interval
+        }, {
+            repeat: {
+                every: createMonitorDto.time_interval * 1000
+            }
         })
         return { ...result, job_id: job.id }
     }
