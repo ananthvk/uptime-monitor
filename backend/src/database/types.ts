@@ -20,7 +20,7 @@ export type UpdateUser = Updateable<UserTable>
 
 export interface MonitorTable {
     id: Generated<number>,
-    user_id: number,
+    usr_id: number,
     name: string,
     date_created: ColumnType<Date, never, never>,
     type: 'HTTP' | 'TCP',

@@ -12,31 +12,31 @@ export class MonitorController {
 
     // GET /monitors, return all monitors created by the current user
     @Get()
-    findAll(){
-        return this.monitorService.findAll(currentUserId)
+    async findAll() {
+        return await this.monitorService.findAll(currentUserId)
     }
 
     // GET /monitor/:id, return details of a single monitor
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) {
-        return this.monitorService.findOne(currentUserId, id)
+    async findOne(@Param('id', ParseIntPipe) id: number) {
+        return await this.monitorService.findOne(currentUserId, id)
     }
 
     // POST /monitor, create a new monitor
     @Post()
-    create(@Body(ValidationPipe) createMonitorDto: CreateMonitorDto) {
-        return this.monitorService.create(currentUserId, createMonitorDto)
+    async create(@Body(ValidationPipe) createMonitorDto: CreateMonitorDto) {
+        return await this.monitorService.create(currentUserId, createMonitorDto)
     }
 
     // PATCH /monitor/:id, update a monitor
     @Patch(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) updateMonitorDto: UpdateMonitorDto) {
-        return this.monitorService.update(currentUserId, id, updateMonitorDto)
+    async update(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) updateMonitorDto: UpdateMonitorDto) {
+        return await this.monitorService.update(currentUserId, id, updateMonitorDto)
     }
 
     // DELETE /monitor/:id, delete a monitor
     @Delete(':id')
-    delete(@Param('id', ParseIntPipe) id: number) {
-        return this.monitorService.delete(currentUserId, id)
+    async delete(@Param('id', ParseIntPipe) id: number) {
+        return await this.monitorService.delete(currentUserId, id)
     }
 }

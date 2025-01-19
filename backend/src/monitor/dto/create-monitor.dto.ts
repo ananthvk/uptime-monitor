@@ -10,7 +10,7 @@ export class CreateMonitorDto {
     @IsEnum(['HTTP', 'TCP'], {
         message: 'Valid type required'
     })
-    type: string;
+    type: 'HTTP' | 'TCP';
 
     @IsUrl()
     @IsNotEmpty()
@@ -25,5 +25,5 @@ export class CreateMonitorDto {
     @IsEnum(['GET', 'HEAD', 'OPTIONS', 'TRACE', 'PUT', 'DELETE', 'POST', 'PATCH', 'CONNECT'], {
         message: 'Invalid HTTP method'
     })
-    method: string
+    method: 'GET'| 'HEAD'| 'OPTIONS'| 'TRACE'| 'PUT'| 'DELETE'| 'POST'| 'PATCH'| 'CONNECT'
 }
