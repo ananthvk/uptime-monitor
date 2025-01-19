@@ -13,6 +13,8 @@ export class MonitorController {
     // GET /monitors, return all monitors created by the current user
     @Get()
     async findAll() {
+        // Simulate waiting time
+        // await new Promise(resolve => setTimeout(resolve, 5000))
         return await this.monitorService.findAll(currentUserId)
     }
 

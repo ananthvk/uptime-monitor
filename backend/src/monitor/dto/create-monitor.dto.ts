@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsPort, IsString, IsUrl } from "class-validator";
+import { IsEnum, IsIP, IsNotEmpty, IsPort, IsString, IsUrl } from "class-validator";
 
 export class CreateMonitorDto {
     @IsString()
@@ -12,7 +12,8 @@ export class CreateMonitorDto {
     })
     type: 'HTTP' | 'TCP';
 
-    @IsUrl()
+    // TODO: Also support ip address
+    @IsUrl({}, { message: 'Must be a valid URL' })
     @IsNotEmpty()
     url: string;
 
@@ -25,5 +26,5 @@ export class CreateMonitorDto {
     @IsEnum(['GET', 'HEAD', 'OPTIONS', 'TRACE', 'PUT', 'DELETE', 'POST', 'PATCH', 'CONNECT'], {
         message: 'Invalid HTTP method'
     })
-    method: 'GET'| 'HEAD'| 'OPTIONS'| 'TRACE'| 'PUT'| 'DELETE'| 'POST'| 'PATCH'| 'CONNECT'
+    method: 'GET' | 'HEAD' | 'OPTIONS' | 'TRACE' | 'PUT' | 'DELETE' | 'POST' | 'PATCH' | 'CONNECT'
 }

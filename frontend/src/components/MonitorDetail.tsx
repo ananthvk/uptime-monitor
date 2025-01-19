@@ -3,6 +3,7 @@ import axiosClient from "../axios-client";
 import { useMutation, useQuery } from "react-query";
 import { Alert, Box, IconButton } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
+import Loader from "./Loader";
 
 type Monitor = { id: string, name: string, url: string, port: string, type: string }
 
@@ -29,7 +30,7 @@ function MonitorDetail() {
 
     const navigate = useNavigate()
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) return <Loader />
     if (error) {
         if ((error as any).status === 404)
             return <h1>404 Not Found</h1>

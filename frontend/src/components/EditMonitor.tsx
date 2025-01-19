@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import axiosClient from '../axios-client';
 import { useNavigate, useParams } from 'react-router';
+import Loader from './Loader';
 
 // TODO: Reuse create monitor instead of creating a new component
 type Monitor = { id: string, name: string, url: string, port: string, type: string, method: string }
@@ -48,7 +49,8 @@ function EditMonitor() {
         }
     }, [serverState])
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) 
+        return <Loader />
     if (error) {
         if ((error as any).status === 404)
             return <h1>404 Not Found</h1>

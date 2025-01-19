@@ -3,6 +3,7 @@ import axiosClient from '../axios-client'
 import { Link } from 'react-router';
 import { Box, Button, Card, CardActionArea } from '@mui/material';
 import { Add } from '@mui/icons-material';
+import Loader from './Loader';
 
 type Monitor = { id: string, name: string, url: string, port: string, type: string }
 
@@ -37,7 +38,8 @@ function MonitorList() {
         isLoading
     } = useQuery("monitorsData", retrieveMonitors)
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading)
+        return <Loader />
     if (error) return <div>Error occured while fetching data from server {(error as any).message} </div>
 
     return <Box display="flex" flexDirection="column" justifyItems="center" alignItems="center">
