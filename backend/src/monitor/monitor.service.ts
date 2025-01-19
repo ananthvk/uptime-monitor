@@ -2,10 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateMonitorDto } from './dto/update-monitor.dto';
 import { CreateMonitorDto } from './dto/create-monitor.dto';
 import { DatabaseService } from 'src/database/database.service';
+import { Queue } from 'bullmq';
+import { InjectQueue } from '@nestjs/bullmq';
 
 @Injectable()
 export class MonitorService {
-    constructor(private readonly databaseService: DatabaseService) {
+    constructor(@InjectQueue('heartbeat') private heartbeatQueue: Queue, private readonly databaseService: DatabaseService) {
     }
 
     async findAll(user_id: number) {
@@ -45,7 +47,7 @@ export class MonitorService {
     }
 
     async create(user_id: number, createMonitorDto: CreateMonitorDto) {
-        return await this.databaseService.getDb().insertInto('monitor').values({
+        const result = await this.databaseService.getDb().insertInto('monitor').values({
             name: createMonitorDto.name,
             usr_id: user_id,
             method: createMonitorDto.method,
@@ -55,6 +57,18 @@ export class MonitorService {
         })
             .returning(['id', 'name', 'usr_id', 'method', 'port', 'type', 'url'])
             .executeTakeFirstOrThrow()
+
+        // Add this monitor to the heartbeat queue
+        const job = await this.heartbeatQueue.add('new_monitor', {
+            id: result.id,
+            name: createMonitorDto.name,
+            usr_id: user_id,
+            method: createMonitorDto.method,
+            port: createMonitorDto.port,
+            type: createMonitorDto.type,
+            url: createMonitorDto.url
+        })
+        return { ...result, job_id: job.id }
     }
 }
 
