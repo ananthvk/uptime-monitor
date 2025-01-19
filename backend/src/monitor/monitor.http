@@ -20,7 +20,7 @@ Content-Type: application/json
 }
 
 ### Update a monitor
-PATCH  {{api_url}}/monitor/3
+PATCH  {{api_url}}/monitor/1
 Content-Type: application/json
 
 {

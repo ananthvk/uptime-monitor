@@ -1,9 +1,9 @@
-import { Link, useNavigate, useParams } from "react-router"
+import { useParams } from "react-router"
 import axiosClient from "../axios-client";
-import { useMutation, useQuery } from "react-query";
-import { Alert, Box, IconButton } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+import { useQuery } from "react-query";
+import { Box } from "@mui/material";
 import Loader from "./Loader";
+import EditDeleteMonitorButton from "./EditDeleteMonitorButton";
 
 type Monitor = { id: string, name: string, url: string, port: string, type: string }
 
@@ -14,21 +14,18 @@ const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
 
 function MonitorDetail() {
     const { monitor_id } = useParams<{ monitor_id: string }>()
+    if (!monitor_id) {
+        return <div>Not Found</div>
+    }
     const {
         data: monitor,
         error,
         isLoading
     } = useQuery(
         ['monitorData', monitor_id],
-        () => { return retrieveMonitorDetail(monitor_id!) },
+        () => { return retrieveMonitorDetail(monitor_id) },
         { enabled: !!monitor_id }
     )
-
-    const deleteMutation = useMutation((_: any): any => {
-        return axiosClient.delete(`monitor/${monitor_id}`)
-    })
-
-    const navigate = useNavigate()
 
     if (isLoading) return <Loader />
     if (error) {
@@ -55,20 +52,7 @@ function MonitorDetail() {
             <h1>
                 {monitor?.name}
             </h1>
-            <Box>
-                <IconButton aria-label="Edit this monitor" component={Link} to={`/monitor/${monitor_id}/edit`}>
-                    <Edit/>
-                </IconButton>
-                <IconButton aria-label="Delete this monitor" onClick={() => {
-                    deleteMutation.mutate({}, {
-                        onSuccess: (_: any) => {
-                            navigate(`/dashboard`)
-                        }
-                    })
-                }}>
-                    <Delete />
-                </IconButton>
-            </Box>
+            <EditDeleteMonitorButton monitor_id={monitor_id} />
         </Box>
         <p>
             {monitor?.type}
@@ -76,8 +60,6 @@ function MonitorDetail() {
         <p>
             {monitor?.url}:{monitor?.port}
         </p>
-        {deleteMutation.isLoading ? <Alert severity='info'>Submitting...</Alert> : <></>}
-        {deleteMutation.isError ? <Alert severity='error'>Error: {(deleteMutation as any).error.message}</Alert> : <></>}
     </Box>
 }
 

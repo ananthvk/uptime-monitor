@@ -10,9 +10,11 @@ type Monitor = { id: string, name: string, url: string, port: string, type: stri
 function MonitorListItem({ monitor }: { monitor: Monitor }) {
     return <Card sx={{ width: '100%' }}>
         <CardActionArea component={Link} to={`/monitor/${monitor.id}`} sx={{ padding: '1em' }}>
-            <h2>
-                {monitor.name}
-            </h2>
+            <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
+                <h2>
+                    {monitor.name}
+                </h2>
+            </Box>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <p style={{ fontStyle: 'italic' }}>
                     {monitor.url}:{monitor.port}
