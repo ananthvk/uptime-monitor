@@ -53,6 +53,7 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
                 setUrl(serverState?.url)
                 setPort(serverState?.port.toString())
                 setMethod(serverState?.method)
+                setTimeInterval(serverState?.time_interval)
             }
         }, [serverState])
 

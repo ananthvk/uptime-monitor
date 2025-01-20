@@ -2,12 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateMonitorDto } from './dto/update-monitor.dto';
 import { CreateMonitorDto } from './dto/create-monitor.dto';
 import { DatabaseService } from 'src/database/database.service';
-import { Queue } from 'bullmq';
-import { InjectQueue } from '@nestjs/bullmq';
+import { HeartbeatService } from 'src/heartbeat/heartbeat.service';
+import { Monitor } from 'src/database/types';
 
 @Injectable()
 export class MonitorService {
-    constructor(@InjectQueue('heartbeat') private heartbeatQueue: Queue, private readonly databaseService: DatabaseService) {
+    constructor(private readonly heartbeatService: HeartbeatService, private readonly databaseService: DatabaseService) {
     }
 
     async findAll(user_id: number) {
@@ -18,26 +18,53 @@ export class MonitorService {
             .execute()
     }
 
-    async findOne(user_id: number, monitor_id: number) {
+    async findOne(user_id: number, monitor_id: number): Promise<Monitor> {
         return await this.databaseService.getDb()
             .selectFrom('monitor')
             .where('usr_id', '=', user_id)
             .where('id', '=', monitor_id)
-            .select(['id', 'usr_id', 'name', 'date_created', 'type', 'url', 'port', 'method', 'time_interval'])
+            .selectAll()
             .executeTakeFirstOrThrow(() => new NotFoundException("Monitor with given id not found"))
     }
 
-    async update(user_id: number, monitor_id: number, updateMonitorDto: UpdateMonitorDto) {
-        await this.databaseService.getDb()
+    async update(user_id: number, monitor_id: number, updateMonitorDto: UpdateMonitorDto): Promise<Monitor> {
+        const monitor: Monitor = await this.databaseService.getDb()
             .updateTable('monitor')
             .set(updateMonitorDto)
             .where('usr_id', '=', user_id)
             .where('id', '=', monitor_id)
+            .returningAll()
             .executeTakeFirstOrThrow(() => new NotFoundException("Monitor with given id not found"))
-        return this.findOne(user_id, monitor_id)
+
+        // Remove any existing job
+        if (monitor.job_id) {
+            await this.heartbeatService.removeHeartbeatTask(monitor.job_id)
+        }
+
+        const job_id = await this.heartbeatService.addHeartbeatTask(monitor!)
+        // Add the job id to the DB
+        await this.databaseService.getDb()
+            .updateTable('monitor')
+            .set({
+                job_id: job_id
+            })
+            .where('id', '=', monitor_id)
+            .executeTakeFirstOrThrow()
+
+        return { ...monitor, job_id: job_id }
     }
 
     async delete(user_id: number, monitor_id: number) {
+        // Remove any associated tasks
+        const res = await this.databaseService.getDb()
+            .selectFrom('monitor')
+            .select('job_id')
+            .where('monitor.id', '=', monitor_id)
+            .executeTakeFirst()
+        if (res && res.job_id) {
+            await this.heartbeatService.removeHeartbeatTask(res.job_id)
+        }
+
         const result = await this.databaseService.getDb()
             .deleteFrom('monitor')
             .where('usr_id', '=', user_id)
@@ -47,6 +74,7 @@ export class MonitorService {
     }
 
     async create(user_id: number, createMonitorDto: CreateMonitorDto) {
+        // TODO: Wrap this in a transaction
         const result = await this.databaseService.getDb().insertInto('monitor').values({
             name: createMonitorDto.name,
             usr_id: user_id,
@@ -59,23 +87,22 @@ export class MonitorService {
             .returning(['id', 'name', 'usr_id', 'method', 'port', 'type', 'url'])
             .executeTakeFirstOrThrow()
 
-        // Add this monitor to the heartbeat queue
-        // TODO: Add job id to db
-        const job = await this.heartbeatQueue.add('check_heartbeat', {
-            id: result.id,
-            name: createMonitorDto.name,
-            usr_id: user_id,
-            method: createMonitorDto.method,
-            port: createMonitorDto.port,
-            type: createMonitorDto.type,
-            url: createMonitorDto.url,
-            time_interval: createMonitorDto.time_interval
-        }, {
-            repeat: {
-                every: createMonitorDto.time_interval * 1000
-            }
-        })
-        return { ...result, job_id: job.id }
+        const monitor = await this.databaseService.getDb()
+            .selectFrom('monitor')
+            .where('id', '=', result.id)
+            .selectAll()
+            .executeTakeFirst()
+        const job_id = await this.heartbeatService.addHeartbeatTask(monitor!)
+        // Add the job id to the DB
+        await this.databaseService.getDb()
+            .updateTable('monitor')
+            .set({
+                job_id: job_id
+            })
+            .where('id', '=', result.id)
+            .executeTakeFirstOrThrow()
+
+        return result
     }
 }
 

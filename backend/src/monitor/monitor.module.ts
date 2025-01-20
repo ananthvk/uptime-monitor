@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MonitorController } from './monitor.controller';
 import { MonitorService } from './monitor.service';
-import { QueueModule } from 'src/queue/queue.module';
+import { HeartbeatModule } from 'src/heartbeat/heartbeat.module';
 
 @Module({
-    imports: [QueueModule],
+    imports: [HeartbeatModule],
     controllers: [MonitorController],
     providers: [MonitorService]
 })

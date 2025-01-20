@@ -27,9 +27,23 @@ export interface MonitorTable {
     url: string,
     port: string,
     method: 'GET' | 'HEAD' | 'OPTIONS' | 'TRACE' | 'PUT' | 'DELETE' | 'POST' | 'PATCH' | 'CONNECT',
-    time_interval: number
+    time_interval: number,
+    job_id: string | null
 }
 
 export type Monitor = Selectable<MonitorTable>
 export type NewMonitor = Insertable<MonitorTable>
 export type UpdateMonitor = Updateable<MonitorTable>
+
+export interface HeartbeatTable {
+    id: Generated<number>,
+    date: Date,
+    result: string,
+    response_time: number,
+    status_code: number | null,
+    monitor_id: number
+}
+
+export type Heartbeat = Selectable<HeartbeatTable>
+export type NewHeartbeat = Insertable<HeartbeatTable>
+export type UpdateHeartbeat = Updateable<HeartbeatTable>
