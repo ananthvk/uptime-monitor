@@ -33,6 +33,9 @@ function MonitorDetail() {
             return <h1>404 Not Found</h1>
         return <div>Error occured while fetching data from server {(error as any).message} </div>
     }
+    if (!monitor) {
+        return <div>Error occured</div>
+    }
 
     return <Box
         sx={{
@@ -50,20 +53,24 @@ function MonitorDetail() {
         marginLeft="1em">
         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
             <h1>
-                {monitor?.name}
+                {monitor.name}
             </h1>
             <EditDeleteMonitorButton monitor_id={monitor_id} />
         </Box>
         <p>
-            {monitor?.type}
+            {monitor.type}
         </p>
         <p>
-            {monitor?.url}:{monitor?.port}
+            {
+                (monitor.type) === "TCP" ?
+                    <>{monitor.url}:{monitor.port}</>
+                    : <>{monitor.url}</>
+            }
         </p>
         <p>
-            Check every {monitor?.time_interval}s 
+            Check every {monitor.time_interval}s
         </p>
-    </Box>
+    </Box >
 }
 
 

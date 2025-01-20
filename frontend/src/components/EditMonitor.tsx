@@ -91,7 +91,11 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
                         <MenuItem value={"TCP"}>TCP</MenuItem>
                     </Select>
                     <TextField required label="URL" variant="outlined" value={url} onChange={(e) => setUrl(e.target.value)} />
-                    <TextField type="number" label="Port" variant="outlined" value={port} onChange={(e) => setPort(e.target.value.toString())} />
+                    {
+                        type === "TCP"
+                            ? <TextField type="number" label="Port" variant="outlined" value={port} onChange={(e) => setPort(e.target.value.toString())} />
+                            : <></>
+                    }
                     {
                         type === "HTTP" ?
                             <Select variant='outlined' label="Type" value={method} onChange={(e) => setMethod(e.target.value)}>
