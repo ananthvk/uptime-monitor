@@ -2,7 +2,7 @@ import { Kysely, sql } from "kysely";
 
 export async function up(db: Kysely<unknown>): Promise<void> {
     await db.schema
-        .createTable('hearbeat')
+        .createTable('heartbeat')
         .addColumn('id', 'serial', (cb) => cb.primaryKey())
         .addColumn('date', 'timestamptz', (cb) => cb.notNull().defaultTo(sql`now()`))
         .addColumn('result', 'text', (cb) => cb.notNull())

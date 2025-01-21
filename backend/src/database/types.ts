@@ -2,7 +2,8 @@ import { ColumnType, Generated, Insertable, Selectable, Updateable } from "kysel
 
 export interface Database {
     user: UserTable,
-    monitor: MonitorTable
+    monitor: MonitorTable,
+    heartbeat: HeartbeatTable
 }
 
 export interface UserTable {
@@ -37,10 +38,11 @@ export type UpdateMonitor = Updateable<MonitorTable>
 export interface HeartbeatTable {
     id: Generated<number>,
     date: Date,
-    result: string,
+    result: 'SUCCESS' | 'FAILURE',
     response_time: number,
     status_code: number | null,
-    monitor_id: number
+    monitor_id: number,
+    error_reason?: string
 }
 
 export type Heartbeat = Selectable<HeartbeatTable>
