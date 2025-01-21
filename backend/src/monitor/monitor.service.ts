@@ -14,7 +14,7 @@ export class MonitorService {
         return await this.databaseService.getDb()
             .selectFrom('monitor')
             .where('usr_id', '=', user_id)
-            .select(['monitor.id', 'monitor.usr_id', 'monitor.name', 'monitor.date_created', 'monitor.type', 'monitor.url', 'monitor.port', 'monitor.method'])
+            .select(['id', 'name', 'type', 'url', 'port', 'method', 'time_interval'])
             .execute()
     }
 

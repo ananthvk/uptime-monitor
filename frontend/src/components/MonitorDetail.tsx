@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import { Box } from "@mui/material";
 import Loader from "./Loader";
 import EditDeleteMonitorButton from "./EditDeleteMonitorButton";
+import MonitorStatusBars from "./MonitorStatusBars";
 
 type Monitor = { id: string, name: string, url: string, port: string, type: string, time_interval: number }
 
@@ -70,6 +71,7 @@ function MonitorDetail() {
         <p>
             Check every {monitor.time_interval}s
         </p>
+        <MonitorStatusBars monitor_id={parseInt(monitor_id)} numberOfBars={30} refetchInterval={monitor.time_interval}/>
     </Box >
 }
 

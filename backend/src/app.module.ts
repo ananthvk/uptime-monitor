@@ -6,9 +6,10 @@ import { DatabaseModule } from './database/database.module';
 import { MonitorModule } from './monitor/monitor.module';
 import { QueueModule } from './queue/queue.module';
 import { HeartbeatModule } from './heartbeat/heartbeat.module';
+import { StatusModule } from './status/status.module';
 
 @Module({
-    imports: [DatabaseModule, MonitorModule, QueueModule, HeartbeatModule],
+    imports: [DatabaseModule, MonitorModule, QueueModule, HeartbeatModule, StatusModule],
     controllers: [AppController],
     providers: [AppService],
 })

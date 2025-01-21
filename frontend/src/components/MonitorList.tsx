@@ -4,8 +4,9 @@ import { Link } from 'react-router';
 import { Box, Button, Card, CardActionArea } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import Loader from './Loader';
+import MonitorStatusBars from './MonitorStatusBars';
 
-type Monitor = { id: string, name: string, url: string, port: string, type: string }
+type Monitor = { id: string, name: string, url: string, port: string, type: string, time_interval: number }
 
 function MonitorListItem({ monitor }: { monitor: Monitor }) {
     return <Card sx={{ width: '100%' }}>
@@ -17,12 +18,18 @@ function MonitorListItem({ monitor }: { monitor: Monitor }) {
             </Box>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <p style={{ fontStyle: 'italic' }}>
-                    {monitor.url}:{monitor.port}
+                    {
+                        (monitor.type) === "TCP" ?
+                            <>{monitor.url}:{monitor.port}</>
+                            : <>{monitor.url}</>
+                    }
                 </p>
+
                 <p style={{ fontWeight: 'bold' }}>
                     {monitor.type}
                 </p>
             </div>
+            <MonitorStatusBars refetchInterval={monitor.time_interval} monitor_id={parseInt(monitor.id)} numberOfBars={20} />
         </CardActionArea>
     </Card>
 }
@@ -42,7 +49,7 @@ function MonitorList() {
 
     if (isLoading)
         return <Loader />
-    if (error) return <div>Error occured while fetching data from server {(error as any).message} </div>
+    if (!monitors || error) return <div>Error occured while fetching data from server {(error as any).message} </div>
 
     return <Box display="flex" flexDirection="column" justifyItems="center" alignItems="center">
         <h1>
@@ -72,7 +79,7 @@ function MonitorList() {
                 </Button>
             </Box>
             {
-                monitors?.map(monitor =>
+                monitors.map(monitor =>
                     <MonitorListItem key={monitor.id} monitor={monitor} />
                 )
             }

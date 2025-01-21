@@ -1,0 +1,26 @@
+.bar-container {
+    display: flex;
+    gap: 0.25em;
+    /* Space between bars */
+    align-items: center;
+}
+
+.bar {
+    width: 1em;
+    height: 2em;
+    background-color: gray;
+    border-radius: 2em;
+}
+
+/* Dynamic colors */
+.bar.gray {
+    background-color: gray;
+}
+
+.bar.green {
+    background-color: green;
+}
+
+.bar.red {
+    background-color: red;
+}
