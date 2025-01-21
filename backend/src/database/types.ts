@@ -28,7 +28,6 @@ export interface MonitorTable {
     port: string,
     method: 'GET' | 'HEAD' | 'OPTIONS' | 'TRACE' | 'PUT' | 'DELETE' | 'POST' | 'PATCH' | 'CONNECT',
     time_interval: number,
-    job_id: string | null
 }
 
 export type Monitor = Selectable<MonitorTable>

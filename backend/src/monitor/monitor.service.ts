@@ -36,44 +36,21 @@ export class MonitorService {
             .returningAll()
             .executeTakeFirstOrThrow(() => new NotFoundException("Monitor with given id not found"))
 
-        // Remove any existing job
-        if (monitor.job_id) {
-            await this.heartbeatService.removeHeartbeatTask(monitor.job_id)
-        }
-
-        const job_id = await this.heartbeatService.addHeartbeatTask(monitor!)
-        // Add the job id to the DB
-        await this.databaseService.getDb()
-            .updateTable('monitor')
-            .set({
-                job_id: job_id
-            })
-            .where('id', '=', monitor_id)
-            .executeTakeFirstOrThrow()
-
-        return { ...monitor, job_id: job_id }
+        await this.heartbeatService.upsertHeartbeatTask(monitor, `monitor-${monitor!.id}`)
+        return { ...monitor }
     }
 
     async delete(user_id: number, monitor_id: number) {
-        // Remove any associated tasks
-        const res = await this.databaseService.getDb()
-            .selectFrom('monitor')
-            .select('job_id')
-            .where('monitor.id', '=', monitor_id)
-            .executeTakeFirst()
-        if (res && res.job_id) {
-            await this.heartbeatService.removeHeartbeatTask(res.job_id)
-        }
-
         const result = await this.databaseService.getDb()
             .deleteFrom('monitor')
             .where('usr_id', '=', user_id)
             .where('id', '=', monitor_id)
             .executeTakeFirstOrThrow(() => new NotFoundException("Monitor with given id not found"))
+        await this.heartbeatService.removeHeartbeatTask(`monitor-${monitor_id}`)
         return { "deleted": result.numDeletedRows.toString() }
     }
 
-    async create(user_id: number, createMonitorDto: CreateMonitorDto) {
+    async create(user_id: number, createMonitorDto: CreateMonitorDto): Promise<Monitor> {
         // TODO: Wrap this in a transaction
         const result = await this.databaseService.getDb().insertInto('monitor').values({
             name: createMonitorDto.name,
@@ -84,25 +61,17 @@ export class MonitorService {
             url: createMonitorDto.url,
             time_interval: createMonitorDto.time_interval
         })
-            .returning(['id', 'name', 'usr_id', 'method', 'port', 'type', 'url'])
+            .returning(['id'])
             .executeTakeFirstOrThrow()
 
-        const monitor = await this.databaseService.getDb()
+        const monitor: Monitor = await this.databaseService.getDb()
             .selectFrom('monitor')
             .where('id', '=', result.id)
             .selectAll()
-            .executeTakeFirst()
-        const job_id = await this.heartbeatService.addHeartbeatTask(monitor!)
-        // Add the job id to the DB
-        await this.databaseService.getDb()
-            .updateTable('monitor')
-            .set({
-                job_id: job_id
-            })
-            .where('id', '=', result.id)
             .executeTakeFirstOrThrow()
 
-        return result
+        await this.heartbeatService.upsertHeartbeatTask(monitor, `monitor-${monitor!.id}`)
+        return monitor
     }
 }
 

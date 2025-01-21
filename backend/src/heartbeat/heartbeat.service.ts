@@ -10,21 +10,21 @@ export class HeartbeatService {
     constructor(@InjectQueue('heartbeat') private heartbeatQueue: Queue) {
     }
 
-    // Returns the repeatable job key
-    async addHeartbeatTask(monitor: Monitor): Promise<string> {
-        // Add this monitor to the heartbeat queue
-        const job = await this.heartbeatQueue.add('check_heartbeat',
-            monitor, {
-            repeat: {
-                every: monitor.time_interval * 1000
+    // Add or update a heartbeat task
+    async upsertHeartbeatTask(monitor: Monitor, schedulerId: string): Promise<void> {
+        await this.heartbeatQueue.upsertJobScheduler(schedulerId, {
+            every: monitor.time_interval * 1000
+        }, {
+            data: monitor,
+            opts: {
+                removeOnComplete: true
             }
         })
-        this.logger.log(`Added ${monitor.id} to job queue with id ${job.repeatJobKey}`)
-        return job.repeatJobKey!
+        this.logger.log(`Upserted "${monitor.name}" [${monitor.id}] to job queue with jobId=${schedulerId}`)
     }
 
-    async removeHeartbeatTask(jobKey: string): Promise<void> {
-        await this.heartbeatQueue.removeJobScheduler(jobKey)
-        this.logger.log(`Removed ${jobKey} from job queue`)
+    async removeHeartbeatTask(jobId: string): Promise<void> {
+        await this.heartbeatQueue.removeJobScheduler(jobId)
+        this.logger.log(`Removed ${jobId} from the job queue`)
     }
 }
