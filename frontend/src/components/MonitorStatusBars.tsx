@@ -24,8 +24,7 @@ function MonitorStatusBars({ monitor_id, refetchInterval, numberOfBars }: { moni
         return <Loader />
     if (!statuses || error) return <div>Error occured while fetching data from server {(error as any).message} </div>
 
-    const statusesPadded = Array(Math.max(0, numberOfBars - statuses.length)).fill("UNKNOWN").concat(statuses);
-    statusesPadded.reverse()
+    const statusesPadded = Array(Math.max(0, numberOfBars - statuses.length)).fill("UNKNOWN").concat(statuses.slice().reverse());
 
     const bars = statusesPadded.map((x, i) => {
         if (x === 'FAILURE')
