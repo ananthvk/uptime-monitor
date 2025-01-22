@@ -11,7 +11,7 @@ const additionalRefectDelay = 1000
 const retrieveLastNStatusChecksDetailed = async (monitor_id: number, numberOfStatus: number): Promise<StatusDetailed[]> => {
     const response = await axiosClient.get<StatusDetailed[]>(`status/${monitor_id}/latest/detailed?n=${numberOfStatus}`);
     response.data.reverse()
-    return response.data
+    return response.data.map(dataPoint => { return { ...dataPoint, time: new Date(dataPoint.date).toLocaleTimeString() } })
 }
 
 function MonitorResponseTimeGraph({ monitor_id, refetchInterval, numberOfDataPoints }: { monitor_id: number, refetchInterval: number, numberOfDataPoints: number }) {
@@ -47,7 +47,7 @@ function MonitorResponseTimeGraph({ monitor_id, refetchInterval, numberOfDataPoi
         </defs>
 
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
+        <XAxis dataKey="time" />
         <YAxis />
         <Tooltip />
         <Legend />
