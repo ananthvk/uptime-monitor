@@ -18,7 +18,7 @@ function MonitorStatusBars({ monitor_id, refetchInterval, numberOfBars }: { moni
         data: statuses,
         error,
         isLoading
-    } = useQuery(`${monitor_id}statusBarData`, () => retrieveLastNStatusChecks(monitor_id, numberOfBars), { refetchInterval: (refetchInterval * 1000) + additionalRefectDelay })
+    } = useQuery(`${monitor_id}statusBarData-${numberOfBars}`, () => retrieveLastNStatusChecks(monitor_id, numberOfBars), { refetchInterval: (refetchInterval * 1000) + additionalRefectDelay })
 
     if (isLoading)
         return <Loader />

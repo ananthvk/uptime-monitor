@@ -1,9 +1,29 @@
 import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 import { Job, Queue } from 'bullmq';
 import { DatabaseService } from 'src/database/database.service';
 import { Monitor } from 'src/database/types';
+
+type InternalAxiosRequestConfigWithMetadata = InternalAxiosRequestConfig & { metadata: any }
+
+// https://stackoverflow.com/questions/49874594/how-to-get-response-times-from-axios
+axios.interceptors.request.use(function (config: InternalAxiosRequestConfig): InternalAxiosRequestConfigWithMetadata {
+    return { ...config, metadata: { startTime: new Date() } }
+}, function (error) {
+    return Promise.reject(error);
+});
+
+axios.interceptors.response.use(function (response: any) {
+    response.config.metadata.endTime = new Date()
+    response.duration = response.config.metadata.endTime - response.config.metadata.startTime
+    return response;
+}, function (error) {
+    error.config.metadata.endTime = new Date();
+    error.duration = error.config.metadata.endTime - error.config.metadata.startTime;
+    return Promise.reject(error);
+});
+
 
 @Injectable()
 @Processor({ name: 'heartbeat' })
@@ -31,11 +51,11 @@ export class HeartbeatConsumer extends WorkerHost {
                     .values({
                         date: new Date(),
                         monitor_id: data.id,
-                        response_time: 0,
+                        response_time: (response as any).duration,
                         status_code: response.status,
                         result: 'SUCCESS'
                     }).execute()
-                this.logger.log(`${data.method} ${data.url} - ${response.status}`)
+                this.logger.log(`${data.method} ${data.url} - ${response.status} ${(response as any).duration}`)
 
             } catch (e: any) {
                 await this.databaseService.getDb()

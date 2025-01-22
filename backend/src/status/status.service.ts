@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Heartbeat } from 'src/database/types';
 type Status = Heartbeat['result']
-const max_n = 30
+type StatusDetailed = Pick<Heartbeat, 'date' | 'response_time' | 'result'>
 
 @Injectable()
 export class StatusService {
@@ -19,5 +19,16 @@ export class StatusService {
             .select(['heartbeat.result'])
             .execute()
         ).map(res => res.result)
+    }
+    async getLastNStatusesDetailed(usr_id: number, monitor_id: number, n: number): Promise<StatusDetailed[]> {
+        return await this.databaseService.getDb()
+            .selectFrom('heartbeat')
+            .innerJoin('monitor', 'heartbeat.monitor_id', 'monitor.id')
+            .where('heartbeat.monitor_id', '=', monitor_id)
+            .where('monitor.usr_id', '=', usr_id)
+            .orderBy('heartbeat.date desc')
+            .limit(n)
+            .select(['heartbeat.date', 'heartbeat.response_time', 'heartbeat.result'])
+            .execute()
     }
 }

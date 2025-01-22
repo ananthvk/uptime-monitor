@@ -13,4 +13,11 @@ export class StatusController {
             throw new BadRequestException('Invalid value of n passed')
         return this.statusService.getLatestNStatuses(usr_id, monitor_id, n)
     }
+
+    @Get(':id/latest/detailed')
+    async getLatestNStatusesDetailed(@Param('id', ParseIntPipe) monitor_id: number, @Query('n', ParseIntPipe) n: number) {
+        if (n <= 0 || n > maxNumberOfStatus)
+            throw new BadRequestException('Invalid value of n passed')
+        return this.statusService.getLastNStatusesDetailed(usr_id, monitor_id, n)
+    }
 }
