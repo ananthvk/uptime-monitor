@@ -29,6 +29,10 @@ Shutdown the previous compose and run it again with
 $ docker compose up
 ```
 
+## Screenshots
+![Screenshot of the dashboard page of the app](readme/dashboard.png?raw=true)
+![Screenshot of a single monitor](readme/monitor.png?raw=true)
+
 
 # Design
 
