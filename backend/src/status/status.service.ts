@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Heartbeat } from 'src/database/types';
 type Status = Heartbeat['result']
-type StatusDetailed = Pick<Heartbeat, 'date' | 'response_time' | 'result'>
+type StatusDetailed = Pick<Heartbeat, 'date' | 'response_time' | 'result' | 'error_reason'>
 
 @Injectable()
 export class StatusService {
@@ -28,7 +28,7 @@ export class StatusService {
             .where('monitor.usr_id', '=', usr_id)
             .orderBy('heartbeat.date desc')
             .limit(n)
-            .select(['heartbeat.date', 'heartbeat.response_time', 'heartbeat.result'])
+            .select(['heartbeat.date', 'heartbeat.response_time', 'heartbeat.result', 'heartbeat.error_reason'])
             .execute()
     }
 }

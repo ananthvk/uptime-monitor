@@ -55,7 +55,7 @@ export class HeartbeatConsumer extends WorkerHost {
                         status_code: response.status,
                         result: 'SUCCESS'
                     }).execute()
-                this.logger.log(`${data.method} ${data.url} - ${response.status} ${(response as any).duration}`)
+                // this.logger.log(`${data.method} ${data.url} - ${response.status} ${(response as any).duration}`)
 
             } catch (e: any) {
                 await this.databaseService.getDb()

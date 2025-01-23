@@ -2,9 +2,10 @@ import { Area, AreaChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "r
 import axiosClient from "../axios-client";
 import { useQuery } from "react-query";
 import Loader from "./Loader";
+import { TooltipProps } from "recharts";
 
 
-type StatusDetailed = { date: Date, response_time: number, result: 'SUCCESS' | 'FAILURE' }
+type StatusDetailed = { date: Date, response_time: number, result: 'SUCCESS' | 'FAILURE', error_reason?: string }
 
 const additionalRefectDelay = 1000
 
@@ -13,6 +14,30 @@ const retrieveLastNStatusChecksDetailed = async (monitor_id: number, numberOfSta
     response.data.reverse()
     return response.data.map(dataPoint => { return { ...dataPoint, time: new Date(dataPoint.date).toLocaleTimeString() } })
 }
+
+const trunc = (s: string | undefined, n: number): string => {
+    if (!s) {
+        return ''
+    }
+    return s.length > n ? s.substring(0, n) + '...' : s;
+}
+
+
+const ResponseTimeTooltip = ({ active, payload }: TooltipProps<any, any>) => {
+    if (active && payload && payload.length) {
+        const data: StatusDetailed = payload[0].payload;
+        const responseTime = data.response_time;
+
+        return (
+            <div style={{ backgroundColor: 'white', padding: '0.5em', border: '1px solid lightgray' }}>
+                {data.result === 'FAILURE' ? <p>Error: {trunc(data.error_reason, 50)}</p> : <p>{`Response Time: ${responseTime} ms`}</p>}
+            </div>
+        );
+    }
+
+    return null;
+};
+
 
 function MonitorResponseTimeGraph({ monitor_id, refetchInterval, numberOfDataPoints }: { monitor_id: number, refetchInterval: number, numberOfDataPoints: number }) {
     const {
@@ -29,8 +54,8 @@ function MonitorResponseTimeGraph({ monitor_id, refetchInterval, numberOfDataPoi
     if (!statuses || error) return <div>Error occured while fetching data from server {(error as any).message} </div>
 
     return <AreaChart
-        width={800}
-        height={300}
+        width={1000}
+        height={400}
         data={statuses}
         margin={{
             top: 30,
@@ -49,7 +74,7 @@ function MonitorResponseTimeGraph({ monitor_id, refetchInterval, numberOfDataPoi
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="time" />
         <YAxis />
-        <Tooltip />
+        <Tooltip content={ResponseTimeTooltip} />
         <Legend />
         <Area type="monotone" dataKey="response_time" stroke="00ff00" activeDot={{ r: 8 }} fill="url(#colorResponseTime)" />
     </AreaChart>

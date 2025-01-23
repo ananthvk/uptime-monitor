@@ -8,7 +8,7 @@ import MonitorStatusBars from "./MonitorStatusBars";
 import MonitorResponseTimeGraph from "./MonitorResponseTimeGraph";
 
 const numberOfDataPointsInStatusBar = 30
-const numberOfDataPointsInGraph = 10
+const numberOfDataPointsInGraph = 20
 
 type Monitor = { id: string, name: string, url: string, port: string, type: string, time_interval: number }
 
@@ -43,42 +43,44 @@ function MonitorDetail() {
     }
 
 
-    return <Box
-        sx={{
-            width: {
-                xs: '90%',
-                sm: '80%',
-                md: '50%',
-                lg: '40%',
-                xl: '30%'
-            },
-            outline: '1px lightgray solid',
-            padding: '1em'
-        }}
-        marginTop="1em"
-        marginLeft="1em">
-        <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-            <h1>
-                {monitor.name}
-            </h1>
-            <EditDeleteMonitorButton monitor_id={monitor_id} />
-        </Box>
-        <p>
-            {monitor.type}
-        </p>
-        <p>
-            {
-                (monitor.type) === "TCP" ?
-                    <>{monitor.url}:{monitor.port}</>
-                    : <>{monitor.url}</>
-            }
-        </p>
-        <p>
-            Check every {monitor.time_interval}s
-        </p>
-        <MonitorStatusBars monitor_id={parseInt(monitor_id)} numberOfBars={numberOfDataPointsInStatusBar} refetchInterval={monitor.time_interval} />
+    return <Box display="flex" flexDirection="row" alignItems="center" justifyContent="flex-start" flexWrap="wrap">
+        <Box
+            sx={{
+                width: {
+                    xs: '90%',
+                    sm: '80%',
+                    md: '50%',
+                    lg: '40%',
+                    xl: '30%'
+                },
+                outline: '1px lightgray solid',
+                padding: '1em'
+            }}
+            marginTop="1em"
+            marginLeft="1em">
+            <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
+                <h1>
+                    {monitor.name}
+                </h1>
+                <EditDeleteMonitorButton monitor_id={monitor_id} />
+            </Box>
+            <p>
+                {monitor.type}
+            </p>
+            <p>
+                {
+                    (monitor.type) === "TCP" ?
+                        <>{monitor.url}:{monitor.port}</>
+                        : <>{monitor.url}</>
+                }
+            </p>
+            <p>
+                Check every {monitor.time_interval}s
+            </p>
+            <MonitorStatusBars monitor_id={parseInt(monitor_id)} numberOfBars={numberOfDataPointsInStatusBar} refetchInterval={monitor.time_interval} />
+        </Box >
         <MonitorResponseTimeGraph monitor_id={parseInt(monitor_id)} numberOfDataPoints={numberOfDataPointsInGraph} refetchInterval={monitor.time_interval} />
-    </Box >
+    </Box>
 }
 
 
