@@ -1,7 +1,7 @@
 import { useParams } from "react-router"
 import axiosClient from "../axios-client";
-import { useQuery } from "react-query";
-import { Box } from "@mui/material";
+import { QueryClient, useQuery, useQueryClient } from "react-query";
+import { Box, Button } from "@mui/material";
 import Loader from "./Loader";
 import EditDeleteMonitorButton from "./EditDeleteMonitorButton";
 import MonitorStatusBars from "./MonitorStatusBars";
@@ -12,12 +12,30 @@ const numberOfDataPointsInGraph = 20
 
 type Monitor = { id: string, name: string, url: string, port: string, type: string, time_interval: number }
 
+
 const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
     const response = await axiosClient.get(`monitor/${id}`);
     return response.data as Monitor
 }
 
+const deleteHistory = async (queryClient: QueryClient, id: string): Promise<void> => {
+    await axiosClient.delete(`status/${id}`)
+    queryClient.refetchQueries({
+        queryKey:
+            [
+                `${id}statusBarData-${numberOfDataPointsInStatusBar}`,
+            ]
+    })
+    queryClient.refetchQueries({
+        queryKey:
+            [
+                `${id}statusBarDataDetailed-${numberOfDataPointsInGraph}`
+            ]
+    })
+}
+
 function MonitorDetail() {
+    const queryClient = useQueryClient()
     const { monitor_id } = useParams<{ monitor_id: string }>()
     if (!monitor_id) {
         return <div>Not Found</div>
@@ -63,6 +81,7 @@ function MonitorDetail() {
                     {monitor.name}
                 </h1>
                 <EditDeleteMonitorButton monitor_id={monitor_id} />
+                <Button variant="outlined" color="error" onClick={() => deleteHistory(queryClient, monitor.id)}>Delete history</Button>
             </Box>
             <p>
                 {monitor.type}
