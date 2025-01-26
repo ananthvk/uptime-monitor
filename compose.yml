@@ -12,15 +12,6 @@ services:
     depends_on:
       - db
       - redis
-    environment:
-      - DB_USER=postgres
-      - DB_PASSWORD=dev
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=upmonitor
-      - DEFAULT_DB=postgres
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
 
   frontend:
     build:
@@ -71,13 +62,6 @@ services:
       - upmonitor-net
     depends_on:
       - db
-    environment:
-      - DB_USER=postgres
-      - DB_PASSWORD=dev
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=upmonitor
-      - DEFAULT_DB=postgres
 
 networks:
   upmonitor-net:

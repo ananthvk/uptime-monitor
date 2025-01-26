@@ -1,7 +1,6 @@
 import './App.css'
 import { BrowserRouter, Link, Route, Routes } from 'react-router'
 import MonitorList from './components/MonitorList'
-import CreateMonitor from './components/CreateMonitor'
 import EditMonitor from './components/EditMonitor'
 import MonitorDetail from './components/MonitorDetail'
 import { AppBar, Button, Toolbar, Typography } from '@mui/material'

@@ -2,8 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Valida
 import { MonitorService } from './monitor.service';
 import { CreateMonitorDto } from './dto/create-monitor.dto';
 import { UpdateMonitorDto } from './dto/update-monitor.dto';
-
-const currentUserId = 101
+import { usr_id as currentUserId } from 'src/constants'
 
 @Controller('monitor')
 export class MonitorController {

@@ -10,8 +10,9 @@ import {
 import { Database } from './types'
 import { config } from 'dotenv'
 import { ConfigService } from '@nestjs/config'
+import { envFilePath } from '../constants'
 
-config()
+config({path: path.resolve(__dirname, path.join('..', '..', envFilePath))})
 const configService = new ConfigService();
 
 async function migrateToLatest() {
@@ -23,9 +24,11 @@ async function migrateToLatest() {
                 user: configService.get('DB_USER'),
                 port: configService.get('DB_PORT'),
                 password: configService.get('DB_PASSWORD'),
+                ssl: configService.get('DB_SSL') || false
             }),
         }),
     })
+    console.log('Created db instance')
 
     const migrator = new Migrator({
         db,
@@ -36,6 +39,7 @@ async function migrateToLatest() {
             migrationFolder: path.join(__dirname, 'migrations'),
         }),
     })
+    console.log('Created migrator')
 
     const { error, results } = await migrator.migrateToLatest()
 

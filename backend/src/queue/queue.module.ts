@@ -3,17 +3,22 @@ import { BullModule } from "@nestjs/bullmq";
 import { BullBoardModule } from "@bull-board/nestjs";
 import { ExpressAdapter } from "@bull-board/express";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
-
+import { ConfigService } from '@nestjs/config';
 
 @Module({
     imports: [
-        BullModule.forRoot({
-            connection: {
-                host: process.env.REDIS_HOST,
-                port: parseInt(process.env.REDIS_PORT!),
-            },
-            defaultJobOptions: {
-            }
+        BullModule.forRootAsync({
+            useFactory: async (configService: ConfigService) => ({
+                connection: {
+                    host: configService.getOrThrow('REDIS_HOST'),
+                    port: parseInt(configService.getOrThrow('REDIS_PORT')),
+                    password: configService.get('REDIS_PASSWORD') || undefined,
+                    tls: configService.get('REDIS_TLS') || undefined
+                },
+                defaultJobOptions: {
+                }
+            }),
+            inject: [ConfigService]
         }),
         BullModule.registerQueue({
             'name': 'heartbeat',

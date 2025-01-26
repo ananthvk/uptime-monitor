@@ -1,7 +1,6 @@
 import { BadRequestException, Controller, Delete, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { StatusService } from './status.service';
-const usr_id = 101;
-const maxNumberOfStatus = 50
+import { maxNumberOfStatus, usr_id } from 'src/constants';
 
 @Controller('status')
 export class StatusController {

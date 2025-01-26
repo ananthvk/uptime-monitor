@@ -15,6 +15,7 @@ export class DatabaseService {
                 user: configService.get('DB_USER'),
                 port: configService.get('DB_PORT'),
                 password: configService.get('DB_PASSWORD'),
+                ssl: configService.get('DB_SSL') || false
             })
         })
 

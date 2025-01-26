@@ -7,9 +7,14 @@ import { MonitorModule } from './monitor/monitor.module';
 import { QueueModule } from './queue/queue.module';
 import { HeartbeatModule } from './heartbeat/heartbeat.module';
 import { StatusModule } from './status/status.module';
+import { ConfigModule } from '@nestjs/config';
+import { envFilePath } from './constants';
 
 @Module({
-    imports: [DatabaseModule, MonitorModule, QueueModule, HeartbeatModule, StatusModule],
+    imports: [DatabaseModule, MonitorModule, QueueModule, HeartbeatModule, StatusModule, ConfigModule.forRoot({
+        envFilePath: envFilePath,
+        isGlobal: true
+    })],
     controllers: [AppController],
     providers: [AppService],
 })
