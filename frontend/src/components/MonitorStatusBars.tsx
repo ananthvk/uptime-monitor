@@ -2,10 +2,7 @@ import { useQuery } from 'react-query';
 import axiosClient from '../axios-client';
 import Loader from './Loader';
 import './MonitorStatusBars.css'
-
-type Status = "SUCCESS" | "FAILURE" | "UNKNOWN"
-// Add one second extra delay before refetching
-const additionalRefectDelay = 1000
+import { Status, additionalRefectDelay } from '../types';
 
 const retrieveLastNStatusChecks = async (monitor_id: number, numberOfStatus: number): Promise<Status[]> => {
     const response = await axiosClient.get<Status[]>(`status/${monitor_id}/latest?n=${numberOfStatus}`);
@@ -22,7 +19,10 @@ function MonitorStatusBars({ monitor_id, refetchInterval, numberOfBars }: { moni
 
     if (isLoading)
         return <Loader />
-    if (!statuses || error) return <div>Error occured while fetching data from server {(error as any).message} </div>
+    if (!statuses)
+        return <div>Could not retrieve status list from server</div>
+    if (error && error instanceof Error)
+        return <div>Error while fetching data: {error.message}</div>
 
     const statusesPadded = Array(Math.max(0, numberOfBars - statuses.length)).fill("UNKNOWN").concat(statuses.slice().reverse());
 

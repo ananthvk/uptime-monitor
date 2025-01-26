@@ -6,16 +6,11 @@ import Loader from "./Loader";
 import EditDeleteMonitorButton from "./EditDeleteMonitorButton";
 import MonitorStatusBars from "./MonitorStatusBars";
 import MonitorResponseTimeGraph from "./MonitorResponseTimeGraph";
+import { MonitorReduced, numberOfDataPointsInGraph, numberOfDataPointsInStatusBar } from "../types";
 
-const numberOfDataPointsInStatusBar = 30
-const numberOfDataPointsInGraph = 20
-
-type Monitor = { id: string, name: string, url: string, port: string, type: string, time_interval: number }
-
-
-const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
-    const response = await axiosClient.get(`monitor/${id}`);
-    return response.data as Monitor
+const retrieveMonitorDetail = async (id: string): Promise<MonitorReduced> => {
+    const response = await axiosClient.get<MonitorReduced>(`monitor/${id}`);
+    return response.data
 }
 
 const deleteHistory = async (queryClient: QueryClient, id: string): Promise<void> => {
@@ -51,10 +46,10 @@ function MonitorDetail() {
     )
 
     if (isLoading) return <Loader />
-    if (error) {
-        if ((error as any).status === 404)
+    if (error && error instanceof Error) {
+        if ('status' in error && error.status === 404)
             return <h1>404 Not Found</h1>
-        return <div>Error occured while fetching data from server {(error as any).message} </div>
+        return <div>Error occured while fetching data from server {error.message} </div>
     }
     if (!monitor) {
         return <div>Error occured</div>

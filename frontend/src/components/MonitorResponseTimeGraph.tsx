@@ -3,11 +3,8 @@ import axiosClient from "../axios-client";
 import { useQuery } from "react-query";
 import Loader from "./Loader";
 import { TooltipProps } from "recharts";
+import { additionalRefectDelay, StatusDetailed } from "../types";
 
-
-type StatusDetailed = { date: Date, response_time: number, result: 'SUCCESS' | 'FAILURE', error_reason?: string }
-
-const additionalRefectDelay = 1000
 
 const retrieveLastNStatusChecksDetailed = async (monitor_id: number, numberOfStatus: number): Promise<StatusDetailed[]> => {
     const response = await axiosClient.get<StatusDetailed[]>(`status/${monitor_id}/latest/detailed?n=${numberOfStatus}`);
@@ -51,7 +48,10 @@ function MonitorResponseTimeGraph({ monitor_id, refetchInterval, numberOfDataPoi
 
     if (isLoading)
         return <Loader />
-    if (!statuses || error) return <div>Error occured while fetching data from server {(error as any).message} </div>
+    if (!statuses)
+        return <div>Could not retrieve status list from server</div>
+    if (error && error instanceof Error)
+        return <div>Error while fetching data: {error.message}</div>
 
     return <AreaChart
         width={1000}

@@ -5,8 +5,7 @@ import { Box, Button, Card, CardActionArea } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import Loader from './Loader';
 import MonitorStatusBars from './MonitorStatusBars';
-
-type Monitor = { id: string, name: string, url: string, port: string, type: string, time_interval: number }
+import { Monitor } from '../types';
 
 function MonitorListItem({ monitor }: { monitor: Monitor }) {
     return <Card sx={{ width: '100%' }}>
@@ -36,8 +35,8 @@ function MonitorListItem({ monitor }: { monitor: Monitor }) {
 
 
 const retrieveMonitors = async (): Promise<Monitor[]> => {
-    const response = await axiosClient.get("monitor");
-    return response.data as Monitor[]
+    const response = await axiosClient.get<Monitor[]>("monitor");
+    return response.data
 }
 
 function MonitorList() {
@@ -49,7 +48,10 @@ function MonitorList() {
 
     if (isLoading)
         return <Loader />
-    if (!monitors || error) return <div>Error occured while fetching data from server {(error as any).message} </div>
+    if (!monitors)
+        return <div>Could not retrieve monitors list from server</div>
+    if (error && error instanceof Error)
+        return <div>Error while fetching data: {error.message}</div>
 
     return <Box display="flex" flexDirection="column" justifyItems="center" alignItems="center">
         <h1>

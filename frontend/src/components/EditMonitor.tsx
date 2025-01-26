@@ -4,15 +4,13 @@ import { useMutation, useQuery } from 'react-query';
 import axiosClient from '../axios-client';
 import { useNavigate, useParams } from 'react-router';
 import Loader from './Loader';
+import { methods, Monitor } from '../types';
 
-type Monitor = { id: string, name: string, url: string, port: string, type: string, method: string, time_interval: number }
 
 const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
     const response = await axiosClient.get(`monitor/${id}`);
     return response.data as Monitor
 }
-
-const methods = ['GET', 'HEAD', 'OPTIONS', 'TRACE', 'PUT', 'DELETE', 'POST', 'PATCH', 'CONNECT'] as const
 
 function EditMonitor({ isEdit }: { isEdit: boolean }) {
 

@@ -10,11 +10,11 @@ export class DatabaseService {
     constructor(private configService: ConfigService) {
         const dialect = new PostgresDialect({
             pool: new Pool({
-                database: configService.get('DB_NAME'),
-                host: configService.get('DB_HOST'),
-                user: configService.get('DB_USER'),
-                port: configService.get('DB_PORT'),
-                password: configService.get('DB_PASSWORD'),
+                database: configService.getOrThrow('DB_NAME'),
+                host: configService.getOrThrow('DB_HOST'),
+                user: configService.getOrThrow('DB_USER'),
+                port: configService.getOrThrow('DB_PORT'),
+                password: configService.getOrThrow('DB_PASSWORD'),
                 ssl: configService.get('DB_SSL') || false
             })
         })
