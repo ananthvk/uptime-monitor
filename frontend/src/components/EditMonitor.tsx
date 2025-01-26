@@ -4,7 +4,8 @@ import { useMutation, useQuery } from 'react-query';
 import axiosClient from '../axios-client';
 import { useNavigate, useParams } from 'react-router';
 import Loader from './Loader';
-import { methods, Monitor } from '../types';
+import { Monitor } from '../types';
+import { methods } from "../constants";
 
 
 const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {

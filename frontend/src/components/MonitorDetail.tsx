@@ -6,7 +6,8 @@ import Loader from "./Loader";
 import EditDeleteMonitorButton from "./EditDeleteMonitorButton";
 import MonitorStatusBars from "./MonitorStatusBars";
 import MonitorResponseTimeGraph from "./MonitorResponseTimeGraph";
-import { MonitorReduced, numberOfDataPointsInGraph, numberOfDataPointsInStatusBar } from "../types";
+import { MonitorReduced } from "../types";
+import { numberOfDataPointsInGraph, numberOfDataPointsInStatusBar } from "../constants";
 
 const retrieveMonitorDetail = async (id: string): Promise<MonitorReduced> => {
     const response = await axiosClient.get<MonitorReduced>(`monitor/${id}`);

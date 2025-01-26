@@ -2,7 +2,8 @@ import { useQuery } from 'react-query';
 import axiosClient from '../axios-client';
 import Loader from './Loader';
 import './MonitorStatusBars.css'
-import { Status, additionalRefectDelay } from '../types';
+import { Status } from '../types';
+import { additionalRefectDelay } from "../constants";
 
 const retrieveLastNStatusChecks = async (monitor_id: number, numberOfStatus: number): Promise<Status[]> => {
     const response = await axiosClient.get<Status[]>(`status/${monitor_id}/latest?n=${numberOfStatus}`);

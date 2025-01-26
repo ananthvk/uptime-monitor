@@ -3,7 +3,8 @@ import axiosClient from "../axios-client";
 import { useQuery } from "react-query";
 import Loader from "./Loader";
 import { TooltipProps } from "recharts";
-import { additionalRefectDelay, StatusDetailed } from "../types";
+import { StatusDetailed } from "../types";
+import { additionalRefectDelay } from "../constants";
 
 
 const retrieveLastNStatusChecksDetailed = async (monitor_id: number, numberOfStatus: number): Promise<StatusDetailed[]> => {
