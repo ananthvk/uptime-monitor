@@ -29,6 +29,9 @@ export interface MonitorTable {
     port: string,
     method: 'GET' | 'HEAD' | 'OPTIONS' | 'TRACE' | 'PUT' | 'DELETE' | 'POST' | 'PATCH' | 'CONNECT',
     time_interval: number,
+    request_timeout: number, // How much time to wait before the request time outs
+    number_of_retries: number, // How many times should a failing service be checked
+    retry_interval: number // Time interval between retries
 }
 
 export type Monitor = Selectable<MonitorTable>
@@ -48,3 +51,5 @@ export interface HeartbeatTable {
 export type Heartbeat = Selectable<HeartbeatTable>
 export type NewHeartbeat = Insertable<HeartbeatTable>
 export type UpdateHeartbeat = Updateable<HeartbeatTable>
+
+export type MonitorReduced = Pick<Monitor, 'id' | 'name' | 'url' | 'port' | 'type' | 'time_interval'>

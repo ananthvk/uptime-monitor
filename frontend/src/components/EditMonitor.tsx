@@ -7,10 +7,9 @@ import Loader from './Loader';
 import { Monitor } from '../types';
 import { methods } from "../constants";
 
-
 const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
-    const response = await axiosClient.get(`monitor/${id}`);
-    return response.data as Monitor
+    const response = await axiosClient.get<Monitor>(`monitor/${id}`);
+    return response.data
 }
 
 function EditMonitor({ isEdit }: { isEdit: boolean }) {
@@ -33,6 +32,9 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
     const [port, setPort] = useState("80")
     const [method, setMethod] = useState("GET")
     const [time_interval, setTimeInterval] = useState(5)
+    const [request_timeout, setRequestTimeout] = useState(15)
+    const [number_of_retries, setNumberOfRetries] = useState(3)
+    const [retry_interval, setRetryInterval] = useState(60)
 
     if (isEdit) {
         const {
@@ -53,6 +55,9 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
                 setPort(serverState?.port.toString())
                 setMethod(serverState?.method)
                 setTimeInterval(serverState?.time_interval)
+                setRequestTimeout(serverState?.request_timeout)
+                setNumberOfRetries(serverState?.number_of_retries)
+                setRetryInterval(serverState?.retry_interval)
             }
         }, [serverState])
 
@@ -105,6 +110,11 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
                             : <></>
                     }
                     <TextField type="number" label="Time interval (in seconds)" variant="outlined" value={time_interval} onChange={(e) => setTimeInterval(parseInt(e.target.value))} />
+
+                    <TextField type="number" label="Number of retries" variant="outlined" value={number_of_retries} onChange={(e) => setNumberOfRetries(parseInt(e.target.value))} />
+                    <TextField type="number" label="Retry interval (in seconds)" variant="outlined" value={retry_interval} onChange={(e) => setRetryInterval(parseInt(e.target.value))} />
+                    <TextField type="number" label="Request timeout (in seconds)" variant="outlined" value={request_timeout} onChange={(e) => setRequestTimeout(parseInt(e.target.value))} />
+
                     <Button variant="contained" onClick={() => {
                         // TODO: Validation
                         mutation.mutate({
@@ -113,7 +123,10 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
                             url,
                             port,
                             method,
-                            time_interval
+                            time_interval,
+                            request_timeout,
+                            number_of_retries,
+                            retry_interval
                         }, {
                             onSuccess: (data: any) => {
                                 navigate(`/monitor/${data.data.id}`)

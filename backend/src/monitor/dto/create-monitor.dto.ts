@@ -1,4 +1,5 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsPort, IsString, IsUrl, Min } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsPort, IsString, IsUrl, Max, Min } from "class-validator";
+import { maxNumberOfRetriesFailedMonitor } from "src/constants";
 
 export class CreateMonitorDto {
     @IsString()
@@ -32,4 +33,18 @@ export class CreateMonitorDto {
     @IsNotEmpty()
     @Min(5)
     time_interval: number
+
+    @IsNumber()
+    @IsNotEmpty()
+    request_timeout: number
+    
+    @IsNumber()
+    @IsNotEmpty()
+    @Max(maxNumberOfRetriesFailedMonitor)
+    number_of_retries: number
+    
+    @IsNumber()
+    @IsNotEmpty()
+    @Min(5)
+    retry_interval: number
 }

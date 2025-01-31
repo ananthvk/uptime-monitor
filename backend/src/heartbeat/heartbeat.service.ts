@@ -12,12 +12,12 @@ export class HeartbeatService {
 
     // Add or update a heartbeat task
     async upsertHeartbeatTask(monitor: Monitor, schedulerId: string): Promise<void> {
-        await this.heartbeatQueue.upsertJobScheduler(schedulerId, {
+        const job = await this.heartbeatQueue.upsertJobScheduler(schedulerId, {
             every: monitor.time_interval * 1000
         }, {
             data: monitor,
             opts: {
-                removeOnComplete: true
+                removeOnComplete: true,
             }
         })
         this.logger.log(`Upserted "${monitor.name}" [${monitor.id}] to job queue with jobId=${schedulerId}`)

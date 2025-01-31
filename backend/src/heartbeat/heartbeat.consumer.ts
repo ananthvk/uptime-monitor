@@ -33,24 +33,24 @@ export class HeartbeatConsumer extends WorkerHost {
         super();
     }
     async process(job: Job<any, any, string>): Promise<any> {
-        const data: Monitor = job.data
+        const monitor: Monitor = job.data
         let response
-        if (data.type === 'HTTP') {
+        if (monitor.type === 'HTTP') {
             // TODO: Make the timeout configurable
             try {
                 response = await axios({
                     headers: {
                         'User-Agent': 'uptime-monitor: Uptime monitoring service'
                     },
-                    method: data.method,
-                    url: data.url,
-                    timeout: 5 * 1000
+                    method: monitor.method,
+                    url: monitor.url,
+                    timeout: monitor.request_timeout * 1000
                 })
                 await this.databaseService.getDb()
                     .insertInto('heartbeat')
                     .values({
                         date: new Date(),
-                        monitor_id: data.id,
+                        monitor_id: monitor.id,
                         response_time: (response as any).duration,
                         status_code: response.status,
                         result: 'SUCCESS'
@@ -62,13 +62,14 @@ export class HeartbeatConsumer extends WorkerHost {
                     .insertInto('heartbeat')
                     .values({
                         date: new Date(),
-                        monitor_id: data.id,
+                        monitor_id: monitor.id,
                         response_time: 0,
                         status_code: response?.status,
                         result: 'FAILURE',
                         error_reason: e.message
                     }).execute()
-                this.logger.log(`${data.method} ${data.url} - ${e.message}`)
+                this.logger.log(`${monitor.method} ${monitor.url} - ${e.message}`)
+                throw e
             }
         }
     }
