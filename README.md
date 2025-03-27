@@ -20,7 +20,11 @@ REDIS_HOST="redis"
 REDIS_PORT=6379
 # REDIS_PASSWORD=
 # REDIS_SSL=true
+
 AUTH0_ISSUER_URL=<your-auth0-issuer-url>
+# For example,
+# AUTH0_ISSUER_URL="https://<name>.us.auth0.com/"
+
 AUTH0_AUDIENCE=<your-auth0-audience>
 ```
 
@@ -28,7 +32,11 @@ Similarly, create a `.env` file in `frontend/` with the following values, fill i
 ```
 VITE_API_URL=http://127.0.0.1:3001/api/v1
 VITE_AUTH0_CLIENT_ID=<your-auth0-client-id>
+
 VITE_AUTH0_DOMAIN=<your-auth0-domain>
+# For example,
+# VITE_AUTH0_DOMAIN=<name>.us.auth0.com
+
 VITE_AUTH0_AUDIENCE=<your-auth0-audience>
 ```
 
