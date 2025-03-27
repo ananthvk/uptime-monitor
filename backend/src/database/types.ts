@@ -1,18 +1,15 @@
 import { ColumnType, Generated, Insertable, Selectable, Updateable } from "kysely"
 
 export interface Database {
-    user: UserTable,
+    usr: UserTable,
     monitor: MonitorTable,
     heartbeat: HeartbeatTable
 }
 
 export interface UserTable {
     id: Generated<number>
-    email: string,
-    first_name: string,
-    last_name: string,
-    password: string,
     date_registered: ColumnType<Date, never, never>
+    sub: string
 }
 
 export type User = Selectable<UserTable>

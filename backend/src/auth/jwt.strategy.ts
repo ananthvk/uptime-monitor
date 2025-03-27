@@ -3,10 +3,11 @@ import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { passportJwtSecret } from "jwks-rsa";
 import { ConfigService } from "@nestjs/config";
+import { DatabaseService } from "src/database/database.service";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor(private readonly configService: ConfigService) {
+    constructor(private readonly configService: ConfigService, private readonly databaseService: DatabaseService) {
         super({
             secretOrKeyProvider: passportJwtSecret({
                 cache: true,
@@ -20,7 +21,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             algorithms: ['RS256']
         })
     }
-    validate(payload: any) {
-        return { "user_id": payload.sub }
+    async validate(payload: any) {
+        const sub: string = payload.sub
+        let user_id = await this.databaseService.getDb()
+            .selectFrom('usr')
+            .select('id')
+            .where('sub', '=', sub)
+            .executeTakeFirst();
+
+        if (!user_id) {
+            const result = await this.databaseService.getDb()
+                .insertInto('usr')
+                .values({ sub: sub })
+                .returning(['id'])
+                .executeTakeFirstOrThrow()
+            user_id = { id: result.id }
+        }
+
+        return { "user_id": user_id?.id }
     }
 }

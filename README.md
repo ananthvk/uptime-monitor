@@ -4,6 +4,35 @@ A up-time monitoring service periodically checks a service/server to determine i
 
 Such services are useful to business owners, organizations and people who host websites since prompt action can be taken in case the service is not operational. These situations can arise due to a variety of reasons such as traffic overload, program bug, hardware failure or network issues. Instead of losing a lot of time in waiting for the customer to report the issue, and degrading customer experience, a up-time monitoring service can send out alerts immediately.
 
+## Setting up environment variables
+
+Create a file `.env` in `backend/` and fill the required values
+```
+REDIS_SSL=true
+DB_USER="postgres"
+DB_PASSWORD="dev"
+DB_HOST="db"
+DB_PORT=5432
+# DB_SSL=true
+DB_NAME="upmonitor"
+DEFAULT_DB="postgres"
+REDIS_HOST="redis"
+REDIS_PORT=6379
+# REDIS_PASSWORD=
+# REDIS_SSL=true
+AUTH0_ISSUER_URL=<your-auth0-issuer-url>
+AUTH0_AUDIENCE=<your-auth0-audience>
+```
+
+Similarly, create a `.env` file in `frontend/` with the following values, fill in your values from Auth0 portal.
+```
+VITE_API_URL=http://127.0.0.1:3001/api/v1
+VITE_AUTH0_CLIENT_ID=<your-auth0-client-id>
+VITE_AUTH0_DOMAIN=<your-auth0-domain>
+VITE_AUTH0_AUDIENCE=<your-auth0-audience>
+```
+
+
 ## How to run?
 
 ```

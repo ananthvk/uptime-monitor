@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGua
 import { MonitorService } from './monitor.service';
 import { CreateMonitorDto } from './dto/create-monitor.dto';
 import { UpdateMonitorDto } from './dto/update-monitor.dto';
-import { usr_id as currentUserId } from 'src/constants'
 import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
 
 @Controller('monitor')
@@ -13,34 +12,38 @@ export class MonitorController {
 
     // GET /monitors, return all monitors created by the current user
     @Get()
-    async findAll() {
+    async findAll(@Request() req: Request) {
         // Simulate waiting time
         // await new Promise(resolve => setTimeout(resolve, 5000))
+        const currentUserId = (req as any).user.user_id
         return await this.monitorService.findAll(currentUserId)
     }
 
     // GET /monitor/:id, return details of a single monitor
     @Get(':id')
     async findOne(@Param('id', ParseIntPipe) id: number, @Request() req: Request) {
-        // console.log((req as any).user.user_id)
+        const currentUserId = (req as any).user.user_id
         return await this.monitorService.findOne(currentUserId, id)
     }
 
     // POST /monitor, create a new monitor
     @Post()
-    async create(@Body(ValidationPipe) createMonitorDto: CreateMonitorDto) {
+    async create(@Body(ValidationPipe) createMonitorDto: CreateMonitorDto, @Request() req: Request) {
+        const currentUserId = (req as any).user.user_id
         return await this.monitorService.create(currentUserId, createMonitorDto)
     }
 
     // PATCH /monitor/:id, update a monitor
     @Patch(':id')
-    async update(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) updateMonitorDto: UpdateMonitorDto) {
+    async update(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) updateMonitorDto: UpdateMonitorDto, @Request() req: Request) {
+        const currentUserId = (req as any).user.user_id
         return await this.monitorService.update(currentUserId, id, updateMonitorDto)
     }
 
     // DELETE /monitor/:id, delete a monitor
     @Delete(':id')
-    async delete(@Param('id', ParseIntPipe) id: number) {
+    async delete(@Param('id', ParseIntPipe) id: number, @Request() req: Request) {
+        const currentUserId = (req as any).user.user_id
         return await this.monitorService.delete(currentUserId, id)
     }
 }
