@@ -9,12 +9,13 @@ import { HeartbeatModule } from './heartbeat/heartbeat.module';
 import { StatusModule } from './status/status.module';
 import { ConfigModule } from '@nestjs/config';
 import { envFilePath } from './constants';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [DatabaseModule, MonitorModule, QueueModule, HeartbeatModule, StatusModule, ConfigModule.forRoot({
         envFilePath: envFilePath,
         isGlobal: true
-    })],
+    }), AuthModule],
     controllers: [AppController],
     providers: [AppService],
 })

@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import axiosClient from '../axios-client';
+import axiosClient, { useAxiosWithAuth } from '../axios-client';
 import Loader from './Loader';
 import './MonitorStatusBars.css'
 import { Status } from '../types';
@@ -12,6 +12,7 @@ const retrieveLastNStatusChecks = async (monitor_id: number, numberOfStatus: num
 
 // Note: refetchInterval is in seconds
 function MonitorStatusBars({ monitor_id, refetchInterval, numberOfBars }: { monitor_id: number, refetchInterval: number, numberOfBars: number }) {
+    useAxiosWithAuth();
     const {
         data: statuses,
         error,

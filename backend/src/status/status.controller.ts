@@ -1,13 +1,16 @@
-import { BadRequestException, Controller, Delete, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Delete, Get, Param, ParseIntPipe, Query, Request, UseGuards } from '@nestjs/common';
 import { StatusService } from './status.service';
 import { maxNumberOfStatus, usr_id } from 'src/constants';
+import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
 
 @Controller('status')
+@UseGuards(JwtAuthGuard)
 export class StatusController {
     constructor(private readonly statusService: StatusService) {
     }
+
     @Get(':id/latest')
-    async getLatestNStatuses(@Param('id', ParseIntPipe) monitor_id: number, @Query('n', ParseIntPipe) n: number) {
+    async getLatestNStatuses(@Request() req: Request, @Param('id', ParseIntPipe) monitor_id: number, @Query('n', ParseIntPipe) n: number) {
         if (n <= 0 || n > maxNumberOfStatus)
             throw new BadRequestException('Invalid value of n passed')
         return this.statusService.getLatestNStatuses(usr_id, monitor_id, n)

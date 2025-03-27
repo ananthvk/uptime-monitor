@@ -1,7 +1,7 @@
 import { Alert, Box, Button, MenuItem, Paper, Select, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
-import axiosClient from '../axios-client';
+import axiosClient, { useAxiosWithAuth } from '../axios-client';
 import { useNavigate, useParams } from 'react-router';
 import Loader from './Loader';
 import { Monitor } from '../types';
@@ -13,6 +13,7 @@ const retrieveMonitorDetail = async (id: string): Promise<Monitor> => {
 }
 
 function EditMonitor({ isEdit }: { isEdit: boolean }) {
+    useAxiosWithAuth();
 
     const { monitor_id } = useParams<{ monitor_id: string }>()
 

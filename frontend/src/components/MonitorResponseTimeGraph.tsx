@@ -1,5 +1,5 @@
 import { Area, AreaChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "recharts";
-import axiosClient from "../axios-client";
+import axiosClient, { useAxiosWithAuth } from "../axios-client";
 import { useQuery } from "react-query";
 import Loader from "./Loader";
 import { TooltipProps } from "recharts";
@@ -38,6 +38,7 @@ const ResponseTimeTooltip = ({ active, payload }: TooltipProps<any, any>) => {
 
 
 function MonitorResponseTimeGraph({ monitor_id, refetchInterval, numberOfDataPoints }: { monitor_id: number, refetchInterval: number, numberOfDataPoints: number }) {
+    useAxiosWithAuth();
     const {
         data: statuses,
         error,

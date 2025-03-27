@@ -1,4 +1,4 @@
-import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq';
+import { InjectQueue, OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { Job, Queue } from 'bullmq';
@@ -33,7 +33,7 @@ export class HeartbeatConsumer extends WorkerHost {
         super();
     }
     async process(job: Job<any, any, string>): Promise<any> {
-        const monitor: Monitor = job.data
+        const monitor: Monitor & { failureCount: number } = job.data
         let response
         if (monitor.type === 'HTTP') {
             // TODO: Make the timeout configurable
@@ -69,8 +69,17 @@ export class HeartbeatConsumer extends WorkerHost {
                         error_reason: e.message
                     }).execute()
                 this.logger.log(`${monitor.method} ${monitor.url} - ${e.message}`)
+                // The job has failed, increase the job's failure count by one
+                // await job.updateData({
+                //    ...monitor, failureCount: monitor.failureCount + 1
+                //})
                 throw e
             }
         }
+    }
+
+    @OnWorkerEvent('failed')
+    onFailed(job: Job) {
+        this.logger.log(`${job.id} [${job.name}] failed, ${job.attemptsMade} ${job.data.failureCount}`)
     }
 }

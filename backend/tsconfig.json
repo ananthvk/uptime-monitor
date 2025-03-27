@@ -19,5 +19,6 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "strictPropertyInitialization": false,
+    "typeRoots": ["node_modules/@types", "src/types"]
   }
 }

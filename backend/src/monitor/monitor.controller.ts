@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards, ValidationPipe, Request } from '@nestjs/common';
 import { MonitorService } from './monitor.service';
 import { CreateMonitorDto } from './dto/create-monitor.dto';
 import { UpdateMonitorDto } from './dto/update-monitor.dto';
 import { usr_id as currentUserId } from 'src/constants'
+import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
 
 @Controller('monitor')
+@UseGuards(JwtAuthGuard)
 export class MonitorController {
     constructor(private readonly monitorService: MonitorService) {
     }
@@ -19,7 +21,8 @@ export class MonitorController {
 
     // GET /monitor/:id, return details of a single monitor
     @Get(':id')
-    async findOne(@Param('id', ParseIntPipe) id: number) {
+    async findOne(@Param('id', ParseIntPipe) id: number, @Request() req: Request) {
+        // console.log((req as any).user.user_id)
         return await this.monitorService.findOne(currentUserId, id)
     }
 

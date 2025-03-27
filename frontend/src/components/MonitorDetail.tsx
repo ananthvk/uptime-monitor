@@ -1,5 +1,5 @@
 import { useParams } from "react-router"
-import axiosClient from "../axios-client";
+import axiosClient, { useAxiosWithAuth } from "../axios-client";
 import { QueryClient, useQuery, useQueryClient } from "react-query";
 import { Box, Button } from "@mui/material";
 import Loader from "./Loader";
@@ -8,6 +8,7 @@ import MonitorStatusBars from "./MonitorStatusBars";
 import MonitorResponseTimeGraph from "./MonitorResponseTimeGraph";
 import { MonitorReduced } from "../types";
 import { numberOfDataPointsInGraph, numberOfDataPointsInStatusBar } from "../constants";
+import { useAuth0 } from '@auth0/auth0-react'
 
 const retrieveMonitorDetail = async (id: string): Promise<MonitorReduced> => {
     const response = await axiosClient.get<MonitorReduced>(`monitor/${id}`);
@@ -31,6 +32,7 @@ const deleteHistory = async (queryClient: QueryClient, id: string): Promise<void
 }
 
 function MonitorDetail() {
+    useAxiosWithAuth();
     const queryClient = useQueryClient()
     const { monitor_id } = useParams<{ monitor_id: string }>()
     if (!monitor_id) {

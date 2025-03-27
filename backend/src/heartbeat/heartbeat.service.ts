@@ -15,7 +15,7 @@ export class HeartbeatService {
         const job = await this.heartbeatQueue.upsertJobScheduler(schedulerId, {
             every: monitor.time_interval * 1000
         }, {
-            data: monitor,
+            data: { ...monitor, failureCount: 0 },
             opts: {
                 removeOnComplete: true,
             }

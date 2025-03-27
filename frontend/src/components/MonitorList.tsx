@@ -1,11 +1,12 @@
 import { useQuery } from 'react-query';
-import axiosClient from '../axios-client'
+import axiosClient, { useAxiosWithAuth } from '../axios-client'
 import { Link } from 'react-router';
 import { Box, Button, Card, CardActionArea } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import Loader from './Loader';
 import MonitorStatusBars from './MonitorStatusBars';
 import { Monitor } from '../types';
+import { useAuth0 } from '@auth0/auth0-react';
 
 function MonitorListItem({ monitor }: { monitor: Monitor }) {
     return <Card sx={{ width: '100%' }}>
@@ -40,6 +41,7 @@ const retrieveMonitors = async (): Promise<Monitor[]> => {
 }
 
 function MonitorList() {
+    useAxiosWithAuth();
     const {
         data: monitors,
         error,
