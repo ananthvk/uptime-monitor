@@ -14,27 +14,29 @@ import AuthGuard from './components/AuthGuard'
 function App() {
     const { isAuthenticated } = useAuth0()
     return (
-        <BrowserRouter>
-            <AppBar position="static" enableColorOnDark>
-                <Toolbar sx={{ gap: 3 }}>
-                    <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
-                        Uptime Monitor
-                    </Typography>
-                    <Button color="info" variant='contained' component={Link} to="/dashboard">Dashboard</Button>
-                    {isAuthenticated ? <LogoutButton /> : <LoginButton />}
-                    <Profile />
-                </Toolbar>
-            </AppBar>
-            <Routes>
-                <Route path="/" element={<IndexPage />} />
-                <Route path="/dashboard" element={<AuthGuard component={MonitorList} />} />
-                <Route path="monitor">
-                    <Route path=":monitor_id" element={<AuthGuard component={MonitorDetail} />} />
-                    <Route path=":monitor_id/edit" element={<AuthGuard component={EditMonitor} props={{ isEdit: true }} />} />
-                    <Route path="new" element={<AuthGuard component={EditMonitor} props={{ isEdit: false }} />} />
-                </Route>
-            </Routes>
-        </BrowserRouter>
+        <div style={{display: 'flex', flexDirection: 'column'}}>
+            <BrowserRouter>
+                <AppBar position="static" enableColorOnDark color='transparent'>
+                    <Toolbar sx={{ gap: 3 }}>
+                        <Typography variant="h5" component={Link} sx={{ flexGrow: 1, outline: "none", textDecoration: "none" }} to="/">
+                            Uptime Monitor
+                        </Typography>
+                        <Button color="info" variant='contained' component={Link} to="/dashboard">Dashboard</Button>
+                        {isAuthenticated ? <LogoutButton /> : <LoginButton />}
+                        <Profile />
+                    </Toolbar>
+                </AppBar>
+                <Routes>
+                    <Route path="/" element={<IndexPage />} />
+                    <Route path="/dashboard" element={<AuthGuard component={MonitorList} props={undefined} />} />
+                    <Route path="monitor">
+                        <Route path=":monitor_id" element={<AuthGuard component={MonitorDetail} props={undefined} />} />
+                        <Route path=":monitor_id/edit" element={<AuthGuard component={(EditMonitor as any)} props={{ isEdit: true }} />} />
+                        <Route path="new" element={<AuthGuard component={(EditMonitor as any)} props={{ isEdit: false }} />} />
+                    </Route>
+                </Routes>
+            </BrowserRouter>
+        </div>
     )
 }
 
