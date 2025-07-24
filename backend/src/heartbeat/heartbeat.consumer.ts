@@ -7,6 +7,10 @@ import { Monitor } from 'src/database/types';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 
+// TODO: One caveat of this solution is that if the resource goes down and comes 
+// online repeatedly, multiple down alert and up alerts will be sent. To solve this issue, also
+// store the number of alerts sent in the last hour (or custom time period), and do not send an alert
+// if the number of alerts cross this threshold
 
 type InternalAxiosRequestConfigWithMetadata = InternalAxiosRequestConfig & { metadata: any }
 
@@ -37,6 +41,8 @@ export class HeartbeatConsumer extends WorkerHost {
     }
     async process(job: Job<any, any, string>): Promise<any> {
         const monitor: Monitor & { failureCount: number } = job.data
+        const failureKey = `fail-${monitor.id}`;
+        const alertKey = `alert-sent-${monitor.id}`;
 
         let response
         if (monitor.type === 'HTTP') {
@@ -58,9 +64,11 @@ export class HeartbeatConsumer extends WorkerHost {
                         status_code: response.status,
                         result: 'SUCCESS'
                     }).execute()
-                // Reset failure counter on successful request
-                const failureKey = `fail-${monitor.id}`;
+                if (await this.cacheManager.get<number>(alertKey)) {
+                    await this.alertUp(monitor)
+                }
                 await this.cacheManager.del(failureKey);
+                await this.cacheManager.del(alertKey);
 
             } catch (e: any) {
                 await this.databaseService.getDb()
@@ -78,14 +86,22 @@ export class HeartbeatConsumer extends WorkerHost {
             }
         }
     }
-    private async alert(monitor: Monitor, monitorId: string, failureCount: number) {
-        this.logger.warn(`ALERT: Monitor ${monitorId} has failed ${failureCount} times consecutively!`)
+    private async alertDown(monitor: Monitor, failureCount: number) {
+        this.logger.warn(`ALERT: Monitor ${monitor.id} has failed ${failureCount} times consecutively!`)
+    }
+
+    private async alertUp(monitor: Monitor) {
+        const failureKey = `fail-${monitor.id}`;
+        const currentFailures = await this.cacheManager.get<number>(failureKey) || 0;
+
+        this.logger.warn(`ALERT: Monitor ${monitor.id} is online after ${currentFailures} failures`)
     }
 
     @OnWorkerEvent('failed')
     async onFailed(job: Job) {
         const monitor: Monitor = job.data;
         const failureKey = `fail-${monitor.id}`;
+        const alertKey = `alert-sent-${monitor.id}`;
 
         try {
             // TODO: Not atomic, make it atomic by using INCR with redis client
@@ -94,11 +110,11 @@ export class HeartbeatConsumer extends WorkerHost {
 
             await this.cacheManager.set(failureKey, newFailureCount, monitor.retry_interval * 1000);
 
-            this.logger.log(`${job.id} [${job.name}] failed, attempt ${job.attemptsMade}, failure count: ${newFailureCount}`)
-
             if (newFailureCount >= (job.data as Monitor).number_of_retries) {
-                await this.alert(monitor, monitor.id.toString(), newFailureCount);
-                // await this.cacheManager.del(failureKey);
+                if (!(await this.cacheManager.get<number>(alertKey))) {
+                    await this.alertDown(monitor, newFailureCount);
+                    await this.cacheManager.set(alertKey, true, monitor.retry_interval * 1000)
+                }
             }
         } catch (error) {
             this.logger.error(`Error handling failure tracking for monitor ${monitor.id}:`, error);

@@ -35,7 +35,7 @@ function EditMonitor({ isEdit }: { isEdit: boolean }) {
     const [time_interval, setTimeInterval] = useState(5)
     const [request_timeout, setRequestTimeout] = useState(15)
     const [number_of_retries, setNumberOfRetries] = useState(3)
-    const [retry_interval, setRetryInterval] = useState(60)
+    const [retry_interval, setRetryInterval] = useState(3600)
 
     if (isEdit) {
         const {
