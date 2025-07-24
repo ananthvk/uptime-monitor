@@ -31,7 +31,7 @@ export class CreateMonitorDto {
     
     @IsNumber()
     @IsNotEmpty()
-    @Min(5)
+    @Min(0)
     time_interval: number
 
     @IsNumber()

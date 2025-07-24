@@ -3,6 +3,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { Heartbeat } from 'src/database/types';
 type Status = Heartbeat['result']
 type StatusDetailed = Pick<Heartbeat, 'date' | 'response_time' | 'result' | 'error_reason'>
+type StatusDateTimeBin = '10 min' | '1 hour' | '1 day' | '1 week' | '1 month'
 
 @Injectable()
 export class StatusService {
@@ -44,5 +45,17 @@ export class StatusService {
             .deleteFrom('heartbeat')
             .where('monitor_id', '=', id)
             .executeTakeFirstOrThrow(() => new NotFoundException('Monitor with given id not found'))
+    }
+    
+    async getStatusAggregate(usr_id: number, monitor_id: number, status_bin: StatusDateTimeBin, limit: number) {
+        const db = this.databaseService.getDb();
+        return await db
+                .selectFrom('heartbeat')
+                .innerJoin('monitor', 'heartbeat.monitor_id', 'monitor.id')
+                .where('heartbeat.monitor_id', '=', monitor_id)
+                .where('monitor.usr_id', '=', usr_id)
+                .orderBy('heartbeat.date desc')
+                .limit(limit)
+                .execute()
     }
 }

@@ -78,7 +78,7 @@ function MonitorResponseTimeGraph({ monitor_id, refetchInterval, numberOfDataPoi
         <YAxis />
         <Tooltip content={ResponseTimeTooltip} />
         <Legend />
-        <Area type="monotone" dataKey="response_time" stroke="00ff00" activeDot={{ r: 8 }} fill="url(#colorResponseTime)" />
+        <Area type="monotone" dataKey="response_time" stroke="00ff00" activeDot={{ r: 8 }} fill="url(#colorResponseTime)" isAnimationActive={false}/>
     </AreaChart>
 }
 export default MonitorResponseTimeGraph;

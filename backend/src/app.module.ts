@@ -1,4 +1,7 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
+import { Keyv } from 'keyv';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppLoggerMiddleware } from './logger.middleware';
@@ -12,10 +15,29 @@ import { envFilePath } from './constants';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-    imports: [DatabaseModule, MonitorModule, QueueModule, HeartbeatModule, StatusModule, ConfigModule.forRoot({
-        envFilePath: envFilePath,
-        isGlobal: true
-    }), AuthModule],
+    imports: [
+        ConfigModule.forRoot({
+            envFilePath: envFilePath,
+            isGlobal: true
+        }),
+        CacheModule.registerAsync({
+            useFactory: async () => {
+                const protocol = process.env.REDIS_SSL === 'true' ? 'rediss' : 'redis';
+                const password = process.env.REDIS_PASSWORD ? `:${process.env.REDIS_PASSWORD}@` : '';
+                const host = process.env.REDIS_HOST;
+                const port = process.env.REDIS_PORT;
+                const redisUrl = `${protocol}://${password}${host}:${port}`;
+
+                return {
+                    stores: [
+                        createKeyv(redisUrl)
+                    ],
+                    ttl: 0,
+                }
+            },
+            isGlobal: true
+        }),
+        DatabaseModule, MonitorModule, QueueModule, HeartbeatModule, StatusModule, AuthModule],
     controllers: [AppController],
     providers: [AppService],
 })

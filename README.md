@@ -180,13 +180,13 @@ severity
 - [x] Setup database connections
 - [x] Implement CRUD for Monitor table. (Create a default user with id 0, to implement this feature)
 - [x] Implement service check, task runner
-- [ ] Make the timeout configurable (from the monitor), store the error reason in db
+- [x] Make the timeout configurable (from the monitor), store the error reason in db
 - [x]  Adding heartbeat result to the database
 - [x] Implement displaying heartbeat result on the monitor page
 - [x] Implement getting the response time
 - [x] Display the response time as a graph
 - [ ] Add error boundaries, so that only the erring component is not displayed
-- [ ] Implement clearing of status data with a button click
+- [x] Implement clearing of status data with a button click
 - [ ] Create event listener, that checks if a job has failed for x times
 - [ ] Implement stopping checks after a number of failed attempts, back off
 - [ ] Implement detection of incident, for now, log the incident to a file/console
@@ -195,10 +195,10 @@ severity
 - [ ] Implement past history of a monitor, show graphs for the last 7 days, last month, last 6 months and other kinds of filters
 - [ ] Implement filtering monitors and search capability
 - [ ] Implement tagging, i.e. the user can add multiple tags to filter Monitors
-- [ ] Implement user registration, login, logout, password reset
+- [x] Implement user registration, login, logout, password reset
 - [x] Implement live status display on the monitor page using
 - [ ] [Optional] Try to implement it with websockets
-- [ ] Add limits to the minimum heartbeat interval, maximum number of monitors that can be created by a single user
+- [x] Add limits to the minimum heartbeat interval, maximum number of monitors that can be created by a single user
 - [ ] Implement custom body/headers for HTTP checks
 - [ ] Implement other forms of service checks
 

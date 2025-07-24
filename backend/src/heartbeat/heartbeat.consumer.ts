@@ -1,9 +1,12 @@
 import { InjectQueue, OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { Job, Queue } from 'bullmq';
 import { DatabaseService } from 'src/database/database.service';
 import { Monitor } from 'src/database/types';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+
 
 type InternalAxiosRequestConfigWithMetadata = InternalAxiosRequestConfig & { metadata: any }
 
@@ -29,14 +32,14 @@ axios.interceptors.response.use(function (response: any) {
 @Processor({ name: 'heartbeat' })
 export class HeartbeatConsumer extends WorkerHost {
     private readonly logger = new Logger(HeartbeatConsumer.name)
-    constructor(@InjectQueue('heartbeat') private readonly queue: Queue, private readonly databaseService: DatabaseService) {
+    constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache, @InjectQueue('heartbeat') private readonly queue: Queue, private readonly databaseService: DatabaseService) {
         super();
     }
     async process(job: Job<any, any, string>): Promise<any> {
         const monitor: Monitor & { failureCount: number } = job.data
+
         let response
         if (monitor.type === 'HTTP') {
-            // TODO: Make the timeout configurable
             try {
                 response = await axios({
                     headers: {
@@ -55,7 +58,9 @@ export class HeartbeatConsumer extends WorkerHost {
                         status_code: response.status,
                         result: 'SUCCESS'
                     }).execute()
-                // this.logger.log(`${data.method} ${data.url} - ${response.status} ${(response as any).duration}`)
+                // Reset failure counter on successful request
+                const failureKey = `fail-${monitor.id}`;
+                await this.cacheManager.del(failureKey);
 
             } catch (e: any) {
                 await this.databaseService.getDb()
@@ -69,17 +74,34 @@ export class HeartbeatConsumer extends WorkerHost {
                         error_reason: e.message
                     }).execute()
                 this.logger.log(`${monitor.method} ${monitor.url} - ${e.message}`)
-                // The job has failed, increase the job's failure count by one
-                // await job.updateData({
-                //    ...monitor, failureCount: monitor.failureCount + 1
-                //})
                 throw e
             }
         }
     }
+    private async alert(monitor: Monitor, monitorId: string, failureCount: number) {
+        this.logger.warn(`ALERT: Monitor ${monitorId} has failed ${failureCount} times consecutively!`)
+    }
 
     @OnWorkerEvent('failed')
-    onFailed(job: Job) {
-        this.logger.log(`${job.id} [${job.name}] failed, ${job.attemptsMade} ${job.data.failureCount}`)
+    async onFailed(job: Job) {
+        const monitor: Monitor = job.data;
+        const failureKey = `fail-${monitor.id}`;
+
+        try {
+            // TODO: Not atomic, make it atomic by using INCR with redis client
+            const currentFailures = await this.cacheManager.get<number>(failureKey) || 0;
+            const newFailureCount = currentFailures + 1;
+
+            await this.cacheManager.set(failureKey, newFailureCount, monitor.retry_interval * 1000);
+
+            this.logger.log(`${job.id} [${job.name}] failed, attempt ${job.attemptsMade}, failure count: ${newFailureCount}`)
+
+            if (newFailureCount >= (job.data as Monitor).number_of_retries) {
+                await this.alert(monitor, monitor.id.toString(), newFailureCount);
+                // await this.cacheManager.del(failureKey);
+            }
+        } catch (error) {
+            this.logger.error(`Error handling failure tracking for monitor ${monitor.id}:`, error);
+        }
     }
 }
